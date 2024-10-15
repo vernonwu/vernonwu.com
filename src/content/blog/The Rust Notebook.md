@@ -1,4 +1,3 @@
-
 ---
 title: The Rust Notebook
 author: Vernon Wu

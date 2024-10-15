@@ -1,7 +1,7 @@
 ---
 title: Solution of Project Euler [484]
 author: Vernon Wu
-pubDatetime: 2024-04-16T15:62:37Z
+pubDatetime: 2024-04-16T15:42:37Z
 slug: solve-euler-484
 featured: false
 draft: false
