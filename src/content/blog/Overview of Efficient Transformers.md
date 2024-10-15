@@ -9,7 +9,7 @@ ogImage: /assets/nozomi.jpg
 tags:
   - Notes
   - Computer Vision
-description: Notes on the paper "Overview of Efficient Transformers".
+description: Notes on "Efficient Transformers: A Survey".
 ---
 
 > Please note that the following content is intended for personal note-taking, and therefore is rather unorganized. On the occasion of any issues, please email me or make a thread in the comment section below.

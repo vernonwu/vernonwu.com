@@ -1,2 +1,2 @@
 # My personal website
-![nozomi](public\nozomi.jpg)
+![nozomi](/public/nozomi.jpg)
