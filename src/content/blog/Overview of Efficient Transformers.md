@@ -8,6 +8,7 @@ draft: false
 ogImage: /assets/nozomi.jpg
 tags:
   - Computer Vision
+  - Machine Learning
   - Notes
 description: notes on "Efficient transformers - A survey"
 ---

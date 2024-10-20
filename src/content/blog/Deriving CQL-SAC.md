@@ -166,7 +166,7 @@ More specifically, we let the regularizer $\mathcal{R}(\mu)=-D_{KL}(\mu,\rho)$, 
 
 Architecture for SAC and its CQL-modified version is illustrated as follows:
 
-![CQL-SAC.png](https://s2.loli.net/2024/10/15/WsXDn43iybBVadL.png)
+ <img src="https://s2.loli.net/2024/10/15/WsXDn43iybBVadL.png" alt="CQL-SAC.png" width="80%"/>
 
 The overall pipeline is visualized below:
 
