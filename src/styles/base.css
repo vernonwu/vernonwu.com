@@ -133,3 +133,16 @@
     @apply outline-2 outline-offset-1 outline-skin-fill focus-visible:no-underline focus-visible:outline-dashed;
   }
 }
+
+.katex-display {
+  min-height: 100%;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+@media (max-aspect-ratio: 2400/1850) {
+  .katex-display::-webkit-scrollbar {
+    display: none;
+  }
+}
