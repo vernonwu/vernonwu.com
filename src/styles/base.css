@@ -115,6 +115,14 @@
     font-weight: var(--shiki-dark-font-weight) !important;
     text-decoration: var(--shiki-dark-text-decoration) !important;
   }
+  html[data-theme="dark"] {
+    .katex {
+      color: white;
+    }
+  }
+  img {
+    background-color: white;
+  }
 }
 
 @layer components {
