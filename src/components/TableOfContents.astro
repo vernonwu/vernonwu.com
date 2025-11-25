@@ -1,0 +1,148 @@
+---
+import type { MarkdownHeading } from "astro";
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+type TocNode = MarkdownHeading & { children: TocNode[] };
+
+const { headings = [] } = Astro.props as Props;
+
+const tocTree: TocNode[] = [];
+const parents: TocNode[] = [];
+
+for (const heading of headings.filter(({ depth }) => depth >= 2 && depth <= 4)) {
+  const node: TocNode = { ...heading, children: [] };
+
+  if (node.depth === 2) {
+    tocTree.push(node);
+    parents[0] = node;
+    parents.length = 1;
+    continue;
+  }
+
+  if (node.depth === 3 && parents[0]) {
+    parents[0].children.push(node);
+    parents[1] = node;
+    parents.length = 2;
+    continue;
+  }
+
+  if (node.depth === 4 && parents[1]) {
+    parents[1].children.push(node);
+    parents[2] = node;
+    parents.length = 3;
+  }
+}
+
+const hasHeadings = tocTree.length > 0;
+---
+
+{hasHeadings && (
+  <nav aria-label="Table of contents" class="toc-card">
+    <div class="toc-heading">On this page</div>
+    <ul class="space-y-1">
+      {tocTree.map((section, sectionIndex) => (
+        <li class="group">
+          <a class="toc-link" href={`#${section.slug}`}>
+            <span class="toc-badge">{sectionIndex + 1}</span>
+            <span class="toc-text">{section.text}</span>
+          </a>
+
+          {section.children.length > 0 && (
+            <ul class="toc-children">
+              {section.children.map((subsection, subsectionIndex) => (
+                <li class="group">
+                  <a class="toc-link toc-sub" href={`#${subsection.slug}`}>
+                    <span class="toc-text toc-text-sub">
+                      {`${sectionIndex + 1}.${subsectionIndex + 1} ${subsection.text}`}
+                    </span>
+                  </a>
+
+                  {subsection.children.length > 0 && (
+                    <ul class="toc-children">
+                      {subsection.children.map((topic, topicIndex) => (
+                        <li>
+                          <a class="toc-link toc-leaf" href={`#${topic.slug}`}>
+                            <span class="toc-text toc-text-leaf">
+                              {`${sectionIndex + 1}.${subsectionIndex + 1}.${topicIndex + 1} ${topic.text}`}
+                            </span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<style>
+  .toc-card {
+    @apply w-full rounded-md border border-skin-line bg-skin-card/60 p-4 text-sm text-skin-base shadow-sm backdrop-blur;
+  }
+
+  .toc-heading {
+    @apply mb-3 text-xs uppercase tracking-[0.16em] text-skin-base/70;
+  }
+
+  .toc-link {
+    @apply flex items-center gap-2 rounded px-2 py-1 transition hover:text-skin-accent focus-visible:outline focus-visible:outline-1 focus-visible:outline-skin-fill;
+  }
+
+  .toc-sub {
+    @apply text-[0.93em];
+  }
+
+  .toc-leaf {
+    @apply text-[0.85em];
+  }
+
+  .toc-badge {
+    @apply inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-skin-accent px-2 text-xs font-semibold text-skin-inverted;
+  }
+
+  .toc-badge-sub {
+    @apply border border-skin-line bg-skin-inverted text-skin-base;
+  }
+
+  .toc-badge-leaf {
+    @apply border border-skin-line bg-skin-card text-skin-base;
+  }
+
+  .toc-text {
+    @apply leading-5;
+  }
+
+  .toc-text-sub {
+    @apply text-sm font-medium;
+  }
+
+  .toc-text-leaf {
+    @apply text-xs font-normal;
+  }
+
+  .toc-children {
+    @apply ml-4 border-l border-dashed border-skin-line pl-3;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 200ms ease, opacity 200ms ease;
+  }
+
+  .toc-children .toc-children {
+    @apply ml-3;
+  }
+
+  .group:hover > .toc-children,
+  .group:focus-within > .toc-children {
+    max-height: 120vh;
+    opacity: 1;
+  }
+</style>
