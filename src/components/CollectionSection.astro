@@ -133,9 +133,13 @@ const statusFilters = [
             ))}
           </ul>
           <div class="pager">
-            <button class="pager-btn" data-page="prev">Prev</button>
+            <button class="pager-btn" data-page="prev" aria-label="Previous page">
+              &lt;
+            </button>
             <span class="pager-meta" id="pager-meta">Page 1</span>
-            <button class="pager-btn" data-page="next">Next</button>
+            <button class="pager-btn" data-page="next" aria-label="Next page">
+              &gt;
+            </button>
           </div>
         </>
       ) : (

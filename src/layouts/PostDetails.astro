@@ -70,9 +70,13 @@ const nextPost =
     id="main-content"
     class="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pb-12 sm:flex-row sm:items-start sm:gap-10"
   >
-    <aside class="toc-wrapper sticky top-24 hidden w-[16rem] shrink-0 sm:block">
-      <TableOfContents headings={headings} />
-    </aside>
+    <div class="toc-spacer hidden w-[16rem] shrink-0 sm:block">
+      <aside
+        class="toc-wrapper fixed top-[15%] w-[16rem]"
+      >
+        <TableOfContents headings={headings} />
+      </aside>
+    </div>
 
     <div class="min-w-0 flex-1">
       <div class="mx-auto w-full max-w-3xl">
@@ -225,6 +229,99 @@ const nextPost =
   }
   createProgressBar();
 
+  // Position ToC relative to its spacer so it stays centered and aligned
+  function positionToc() {
+    const toc = document.querySelector(".toc-wrapper");
+    const spacer = document.querySelector(".toc-spacer");
+    if (!toc || !spacer) return;
+
+    const rect = spacer.getBoundingClientRect();
+    toc.style.left = `${rect.left}px`;
+  }
+  const schedulePositionToc = () => requestAnimationFrame(positionToc);
+  schedulePositionToc();
+  window.addEventListener("resize", schedulePositionToc, { passive: true });
+
+  // Highlight current section and subsection in the ToC
+  let cleanupTocHighlight;
+  function initTocHighlight() {
+    const articleHeadings = Array.from(
+      document.querySelectorAll("#article h2, #article h3, #article h4")
+    );
+    const tocLinks = new Map(
+      Array.from(
+        document.querySelectorAll(".toc-link[data-toc-slug]"),
+        link => [link.getAttribute("data-toc-slug"), link]
+      )
+    );
+
+    if (!articleHeadings.length || tocLinks.size === 0) return;
+
+    const parentOf = new Map();
+    let lastH2 = null;
+    let lastH3 = null;
+    for (const heading of articleHeadings) {
+      if (heading.tagName === "H2") {
+        lastH2 = heading.id;
+        lastH3 = null;
+        parentOf.set(heading.id, null);
+      } else if (heading.tagName === "H3") {
+        parentOf.set(heading.id, lastH2);
+        lastH3 = heading.id;
+      } else if (heading.tagName === "H4") {
+        parentOf.set(heading.id, lastH3 ?? lastH2);
+      }
+    }
+
+    const clearActive = () =>
+      tocLinks.forEach(link => link.classList.remove("active"));
+
+    const markActiveChain = slug => {
+      const visited = new Set();
+      let current = slug;
+      while (current && !visited.has(current)) {
+        visited.add(current);
+        tocLinks.get(current)?.classList.add("active");
+        current = parentOf.get(current) ?? null;
+      }
+    };
+
+    const getCurrentSlug = () => {
+      const threshold = window.scrollY + window.innerHeight * 0.25;
+      let current = articleHeadings[0]?.id ?? null;
+      for (const heading of articleHeadings) {
+        if (heading.offsetTop <= threshold) {
+          current = heading.id;
+        } else {
+          break;
+        }
+      }
+      return current;
+    };
+
+    let activeSlug = null;
+    const updateActive = () => {
+      const slug = getCurrentSlug();
+      if (!slug || slug === activeSlug) return;
+      activeSlug = slug;
+      clearActive();
+      markActiveChain(slug);
+    };
+
+    const onScroll = () => requestAnimationFrame(updateActive);
+    const onResize = () => requestAnimationFrame(updateActive);
+
+    document.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
+    updateActive();
+
+    return () => {
+      document.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+    };
+  }
+  cleanupTocHighlight = initTocHighlight();
+
   /** Update the progress bar
    *  when user scrolls */
   function updateScrollProgress() {
@@ -244,27 +341,6 @@ const nextPost =
     });
   }
   updateScrollProgress();
-
-  // Keep TOC pinned just below the header, even after refresh or view transition
-  const tocResizeFlag = "__tocResizeHandlerAdded";
-  function setTocStickyOffset() {
-    const toc = document.querySelector(".toc-wrapper");
-    const header = document.querySelector("header");
-    if (!toc || !header) return;
-
-    const gap = 16; // breathing room below the header
-    toc.style.top = `${header.getBoundingClientRect().height + gap}px`;
-  }
-
-  function initTocStickyOffset() {
-    requestAnimationFrame(setTocStickyOffset);
-
-    if (!(tocResizeFlag in window)) {
-      window.addEventListener("resize", setTocStickyOffset, { passive: true });
-      window[tocResizeFlag] = true;
-    }
-  }
-  initTocStickyOffset();
 
   /** Attaches links to headings in the document,
    *  allowing sharing of sections easily */
@@ -342,7 +418,9 @@ const nextPost =
 
   /* Go to page start after page swap */
   document.addEventListener("astro:after-swap", () => {
-    initTocStickyOffset();
+    cleanupTocHighlight?.();
+    cleanupTocHighlight = initTocHighlight();
+    schedulePositionToc();
     window.scrollTo({ left: 0, top: 0, behavior: "instant" });
   });
 </script>

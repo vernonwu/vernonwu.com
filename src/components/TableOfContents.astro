@@ -45,7 +45,7 @@ const hasHeadings = tocTree.length > 0;
     <ul class="space-y-1">
       {tocTree.map((section, sectionIndex) => (
         <li class="group">
-          <a class="toc-link" href={`#${section.slug}`}>
+          <a class="toc-link" href={`#${section.slug}`} data-toc-slug={section.slug}>
             <span class="toc-badge">{sectionIndex + 1}</span>
             <span class="toc-text">{section.text}</span>
           </a>
@@ -54,7 +54,11 @@ const hasHeadings = tocTree.length > 0;
             <ul class="toc-children">
               {section.children.map((subsection, subsectionIndex) => (
                 <li class="group">
-                  <a class="toc-link toc-sub" href={`#${subsection.slug}`}>
+                  <a
+                    class="toc-link toc-sub"
+                    href={`#${subsection.slug}`}
+                    data-toc-slug={subsection.slug}
+                  >
                     <span class="toc-text toc-text-sub">
                       {`${sectionIndex + 1}.${subsectionIndex + 1} ${subsection.text}`}
                     </span>
@@ -64,7 +68,11 @@ const hasHeadings = tocTree.length > 0;
                     <ul class="toc-children">
                       {subsection.children.map((topic, topicIndex) => (
                         <li>
-                          <a class="toc-link toc-leaf" href={`#${topic.slug}`}>
+                          <a
+                            class="toc-link toc-leaf"
+                            href={`#${topic.slug}`}
+                            data-toc-slug={topic.slug}
+                          >
                             <span class="toc-text toc-text-leaf">
                               {`${sectionIndex + 1}.${subsectionIndex + 1}.${topicIndex + 1} ${topic.text}`}
                             </span>
@@ -94,6 +102,10 @@ const hasHeadings = tocTree.length > 0;
 
   .toc-link {
     @apply flex items-center gap-2 rounded px-2 py-1 transition hover:text-skin-accent focus-visible:outline focus-visible:outline-1 focus-visible:outline-skin-fill;
+  }
+
+  .toc-link.active {
+    @apply bg-skin-card/60 text-skin-accent;
   }
 
   .toc-sub {
@@ -133,7 +145,9 @@ const hasHeadings = tocTree.length > 0;
     max-height: 0;
     opacity: 0;
     overflow: hidden;
-    transition: max-height 200ms ease, opacity 200ms ease;
+    will-change: max-height, opacity;
+    transition: max-height 320ms cubic-bezier(0.25, 0.8, 0.25, 1),
+      opacity 220ms ease-in-out;
   }
 
   .toc-children .toc-children {

@@ -2,6 +2,7 @@
 import { LOCALE, SITE } from "@config";
 import "@styles/base.css";
 import { ViewTransitions } from "astro:transitions";
+import BackToTop from "@components/BackToTop.astro";
 
 const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
 
@@ -143,5 +144,6 @@ const structuredData = {
   </head>
   <body>
     <slot />
+    <BackToTop />
   </body>
 </html>
