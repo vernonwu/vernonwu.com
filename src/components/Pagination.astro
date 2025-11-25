@@ -1,13 +1,12 @@
 ---
 import type { Page } from "astro";
 import LinkButton from "./LinkButton.astro";
-import type { CollectionEntry } from "astro:content";
 
 export interface Props {
-  page: Page<CollectionEntry<"blog">>;
+  page: Page<unknown>;
 }
 
-const { page } = Astro.props;
+const { page } = Astro.props as Props;
 ---
 
 {

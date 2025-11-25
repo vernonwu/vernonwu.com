@@ -1,0 +1,58 @@
+---
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import CollectionSection from "@components/CollectionSection.astro";
+import Layout from "@layouts/Layout.astro";
+import Main from "@layouts/Main.astro";
+import { COLLECTION, SITE } from "@config";
+import { fetchMalListAll } from "@utils/myanimelist";
+import type { CollectionItem } from "@utils/myanimelist";
+
+const clientId = import.meta.env.MAL_CLIENT_ID;
+const username = import.meta.env.MAL_USERNAME ?? COLLECTION.malUsername;
+
+const anime = await fetchMalListAll("anime", {
+  clientId,
+  username,
+  limit: 100,
+});
+
+const manga = await fetchMalListAll("manga", {
+  clientId,
+  username,
+  limit: 100,
+});
+
+const items: CollectionItem[] = [...anime.items, ...manga.items].sort(
+  (a, b) => (b.score ?? 0) - (a.score ?? 0)
+);
+
+const totals = {
+  total: items.length,
+  type: items.reduce<Record<string, number>>((acc, item) => {
+    acc[item.typeCategory] = (acc[item.typeCategory] ?? 0) + 1;
+    return acc;
+  }, {}),
+  status: items.reduce<Record<string, number>>((acc, item) => {
+    acc[item.statusCategory] = (acc[item.statusCategory] ?? 0) + 1;
+    return acc;
+  }, {}),
+};
+
+const error =
+  (clientId ? undefined : "MAL_CLIENT_ID is missing.") ??
+  (username ? undefined : "MAL_USERNAME is missing.") ??
+  anime.error ??
+  manga.error;
+---
+
+<Layout title={`Collection | ${SITE.title}`}>
+  <Header activeNav="collection" />
+  <Main
+    pageTitle="Collection"
+    pageDesc="Anime and manga I track on MyAnimeList."
+  >
+    <CollectionSection {items} {totals} error={error} />
+  </Main>
+  <Footer />
+</Layout>

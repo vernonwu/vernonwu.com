@@ -72,7 +72,7 @@ export const SOCIALS: SocialObjects = [
   },
   {
     name: "Mail",
-    href: "vernonwu.work@gmail.com",
+    href: "mailto:vernonwu.work@gmail.com",
     linkTitle: `Send an email to ${SITE.title}`,
     active: true,
   },
@@ -167,3 +167,9 @@ export const SOCIALS: SocialObjects = [
     active: false,
   },
 ];
+
+export const COLLECTION = {
+  malUsername: "vernonwu", // override with MAL_USERNAME env var if needed
+  animeLimit: 6,
+  mangaLimit: 6,
+} as const;

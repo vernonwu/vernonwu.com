@@ -1,0 +1,423 @@
+---
+import type { CollectionItem } from "@utils/myanimelist";
+
+interface Totals {
+  total: number;
+  type: Record<string, number>;
+  status: Record<string, number>;
+}
+
+interface Props {
+  items: CollectionItem[];
+  totals: Totals;
+  error?: string;
+}
+
+const { items, totals, error } = Astro.props;
+
+const typeFilters = [
+  { key: "all", label: "All", count: totals.total },
+  { key: "TV", label: "TV", count: totals.type["TV"] ?? 0 },
+  { key: "Movie", label: "Movie", count: totals.type["Movie"] ?? 0 },
+  { key: "Manga", label: "Manga", count: totals.type["Manga"] ?? 0 },
+];
+
+const statusFilters = [
+  { key: "all", label: "All", count: totals.total },
+  {
+    key: "consuming",
+    label: "Currently Consuming",
+    count: totals.status["consuming"] ?? 0,
+  },
+  {
+    key: "completed",
+    label: "Completed",
+    count: totals.status["completed"] ?? 0,
+  },
+  {
+    key: "plan",
+    label: "Plan to Watch",
+    count: totals.status["plan"] ?? 0,
+  },
+];
+---
+
+<section id="collection">
+  {error ? (
+    <p class="notice">
+      Unable to load MyAnimeList data: {error}
+    </p>
+  ) : (
+    <div class="collection-group">
+      <div class="filters">
+        <div class="type-row">
+          {typeFilters.map(filter => (
+            <span
+              role="button"
+              tabindex={filter.count === 0 ? -1 : 0}
+              class:list={[
+                "type-item",
+                { active: filter.key === "all", disabled: filter.count === 0 },
+              ]}
+              data-filter="type"
+              data-key={filter.key}
+              aria-pressed={filter.key === "all"}
+            >
+              <span class="type-label">{filter.label}</span>
+              <span class="type-count">{filter.count}</span>
+            </span>
+          ))}
+        </div>
+        <div class="divider"></div>
+        <div class="filter-row">
+          {statusFilters.map(filter => (
+            <button
+              class:list={[
+                "filter-pill",
+                { active: filter.key === "all", disabled: filter.count === 0 },
+              ]}
+              data-filter="status"
+              data-key={filter.key}
+              aria-pressed={filter.key === "all"}
+              disabled={filter.count === 0}
+            >
+              {filter.label} <span class="pill-count">({filter.count})</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {items.length > 0 ? (
+        <>
+          <p class="muted" id="visible-meta">
+            Showing <span id="visible-count">{items.length}</span> of{" "}
+            {items.length} entries
+          </p>
+          <ul class="collection-grid" id="collection-grid">
+            {items.map(item => (
+              <li
+                class="collection-card"
+                data-item
+                data-type={item.typeCategory}
+                data-status={item.statusCategory}
+              >
+                <a href={item.url} target="_blank" rel="noreferrer">
+                  <div class="thumb">
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <div class="placeholder" aria-hidden="true">
+                        <span>?</span>
+                      </div>
+                    )}
+                    <span class="type-chip">{item.typeCategory}</span>
+                    {typeof item.score === "number" && item.score > 0 && (
+                      <span class="score-chip">{item.score}</span>
+                    )}
+                    <div class="title-overlay">
+                      <div class="title-text">{item.title}</div>
+                    </div>
+                    {item.tags?.length ? (
+                      <div class="tags-overlay" title={item.tags.join(", ")}>
+                        <div class="tags-text">{item.tags.join(", ")}</div>
+                      </div>
+                    ) : null}
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <div class="pager">
+            <button class="pager-btn" data-page="prev">Prev</button>
+            <span class="pager-meta" id="pager-meta">Page 1</span>
+            <button class="pager-btn" data-page="next">Next</button>
+          </div>
+        </>
+      ) : (
+        <p class="muted">Nothing to show right now.</p>
+      )}
+    </div>
+  )}
+</section>
+
+<style>
+  #collection {
+    @apply pb-8 pt-2;
+  }
+  .notice {
+    @apply mt-4 rounded-lg border border-skin-line bg-skin-card p-4 text-sm text-skin-base/80;
+  }
+  .collection-group {
+    @apply mt-2;
+  }
+  .filters {
+    @apply mb-8 flex flex-col gap-3;
+  }
+  .type-row {
+    @apply flex flex-wrap gap-3;
+  }
+  .filter-row {
+    @apply flex flex-wrap gap-2;
+  }
+  .divider {
+    height: 1px;
+    width: 100%;
+    background-color: rgba(var(--color-border), 0.7);
+  }
+  .type-item {
+    @apply flex items-center gap-2 rounded-md px-2 py-1 text-base font-medium transition;
+    color: rgb(var(--color-text-base));
+  }
+  .type-item .type-count {
+    @apply rounded-full bg-skin-card px-2 py-0.5 text-xs;
+  }
+  .type-item.active {
+    color: rgb(var(--color-accent));
+  }
+  .type-item:not(.active):hover {
+    color: rgb(var(--color-text-base));
+    text-decoration: underline;
+  }
+  .type-item.disabled {
+    @apply opacity-60;
+  }
+  .filter-pill {
+    @apply flex items-center gap-2 rounded-full border border-transparent px-3 py-2 text-sm font-medium transition-all;
+    background: rgb(var(--color-card));
+    color: rgb(var(--color-text-base));
+  }
+  .filter-pill .pill-count {
+    @apply text-xs opacity-75;
+  }
+  .filter-pill.active {
+    background: linear-gradient(135deg, #6aa9ff, #4f8dff);
+    color: white;
+    box-shadow: 0 4px 12px rgba(79, 141, 255, 0.35);
+  }
+  .filter-pill:not(.active):hover {
+    background: rgba(var(--color-card-muted), 0.8);
+  }
+  .filter-pill.disabled {
+    @apply opacity-60;
+  }
+  .collection-grid {
+    @apply grid gap-4 sm:grid-cols-2;
+  }
+  @media (min-width: 960px) {
+    .collection-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .collection-card {
+    @apply overflow-hidden rounded-xl border border-skin-line bg-skin-card shadow-sm transition hover:-translate-y-1 hover:shadow-lg;
+  }
+  .collection-card a {
+    @apply block h-full;
+  }
+  .thumb {
+    @apply relative h-64 w-full overflow-hidden sm:h-72;
+  }
+  .collection-card img,
+  .placeholder {
+    @apply h-full w-full object-cover;
+  }
+  .placeholder {
+    @apply flex h-full w-full items-center justify-center bg-skin-card text-3xl font-semibold text-skin-base/60;
+  }
+  .type-chip {
+    @apply absolute left-3 top-3 flex items-center gap-2 rounded-full bg-skin-card-muted/90 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide;
+  }
+  .collection-card:hover .type-chip {
+    @apply opacity-0;
+  }
+  .score-chip {
+    @apply absolute right-3 top-3 rounded-full bg-skin-card-muted/90 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide;
+  }
+  .collection-card:hover .score-chip {
+    @apply opacity-0;
+  }
+  .title-overlay {
+    @apply absolute left-0 right-0 top-0 overflow-hidden;
+    pointer-events: none;
+    height: 0;
+    transition: height 180ms ease, padding 180ms ease, background-color 180ms ease;
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+  }
+  .collection-card:hover .title-overlay {
+    height: auto;
+    padding: 0.5rem 1rem 0.75rem;
+  }
+  .title-text {
+    @apply text-sm font-medium leading-snug;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .tags-overlay {
+    @apply absolute left-0 right-0 bottom-0 overflow-hidden;
+    pointer-events: none;
+    height: 0;
+    transition: height 180ms ease, padding 180ms ease, background-color 180ms ease;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+  }
+  .collection-card:hover .tags-overlay {
+    height: auto;
+    padding: 0.5rem 1rem 0.75rem;
+  }
+  .tags-text {
+    @apply text-xs;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .muted {
+    @apply text-sm text-skin-base/70;
+  }
+  .pager {
+    @apply mt-4 flex items-center justify-center gap-3;
+  }
+  .pager-btn {
+    @apply rounded-full bg-skin-card px-4 py-2 text-sm font-medium transition hover:bg-skin-card-muted;
+  }
+  .pager-meta {
+    @apply text-sm text-skin-base/80;
+  }
+  .hidden {
+    display: none;
+  }
+</style>
+
+<script>
+  const PAGE_SIZE = 6;
+  const typeButtons = Array.from(
+    document.querySelectorAll("[data-filter='type']")
+  );
+  const statusButtons = Array.from(
+    document.querySelectorAll("[data-filter='status']")
+  );
+  const items = Array.from(document.querySelectorAll("[data-item]"));
+  const pagerMeta = document.getElementById("pager-meta");
+  const visibleCount = document.getElementById("visible-count");
+  const prevBtn = document.querySelector("[data-page='prev']");
+  const nextBtn = document.querySelector("[data-page='next']");
+  const statusCountEls = statusButtons.map(btn =>
+    btn.querySelector(".pill-count")
+  );
+
+  let activeType = "all";
+  let activeStatus = "all";
+  let currentPage = 1;
+
+  function setActive(buttons, key) {
+    buttons.forEach(btn => {
+      const isActive = btn.dataset.key === key;
+      btn.classList.toggle("active", isActive);
+      btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+  }
+
+  function applyFilters() {
+    const filtered = items.filter(item => {
+      const type = item.dataset.type;
+      const status = item.dataset.status;
+      const matchType = activeType === "all" || type === activeType;
+      const matchStatus = activeStatus === "all" || status === activeStatus;
+      return matchType && matchStatus;
+    });
+
+    // Update status counts based on active type filter
+    const statusCounts: Record<string, number> = {};
+    items.forEach(item => {
+      const type = item.dataset.type;
+      const status = item.dataset.status ?? "other";
+      const matchType = activeType === "all" || type === activeType;
+      if (matchType) {
+        statusCounts[status] = (statusCounts[status] ?? 0) + 1;
+      }
+    });
+
+    statusButtons.forEach((btn, idx) => {
+      const key = btn.dataset.key ?? "all";
+      const count =
+        key === "all"
+          ? Object.values(statusCounts).reduce((a, b) => a + b, 0)
+          : statusCounts[key] ?? 0;
+      const countEl = statusCountEls[idx];
+      if (countEl) countEl.textContent = `(${count})`;
+      btn.classList.toggle("disabled", count === 0);
+      if (count === 0) {
+        btn.setAttribute("tabindex", "-1");
+      } else {
+        btn.setAttribute("tabindex", "0");
+      }
+    });
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    items.forEach(item => item.classList.add("hidden"));
+    filtered.forEach((item, index) => {
+      const pageIndex = Math.floor(index / PAGE_SIZE) + 1;
+      if (pageIndex === currentPage) {
+        item.classList.remove("hidden");
+      }
+    });
+
+    if (pagerMeta) {
+      pagerMeta.textContent = `Page ${currentPage} of ${totalPages}`;
+    }
+    if (visibleCount) {
+      visibleCount.textContent = filtered.length.toString();
+    }
+
+    prevBtn?.toggleAttribute("disabled", currentPage === 1);
+    nextBtn?.toggleAttribute("disabled", currentPage === totalPages);
+  }
+
+  typeButtons.forEach(btn => {
+    const activate = () => {
+      if (btn.dataset.key === activeType || btn.classList.contains("disabled"))
+        return;
+      activeType = btn.dataset.key ?? "all";
+      currentPage = 1;
+      setActive(typeButtons, activeType);
+      applyFilters();
+    };
+    btn.addEventListener("click", activate);
+    btn.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        activate();
+      }
+    });
+  });
+
+  statusButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (btn.dataset.key === activeStatus || btn.classList.contains("disabled"))
+        return;
+      activeStatus = btn.dataset.key ?? "all";
+      currentPage = 1;
+      setActive(statusButtons, activeStatus);
+      applyFilters();
+    });
+  });
+
+  prevBtn?.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage -= 1;
+      applyFilters();
+    }
+  });
+
+  nextBtn?.addEventListener("click", () => {
+    currentPage += 1;
+    applyFilters();
+  });
+
+  applyFilters();
+</script>
