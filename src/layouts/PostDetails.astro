@@ -307,8 +307,8 @@ const nextPost =
     right: 0.75rem;
     top: 0.75rem;
     z-index: 2;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.82rem;
     line-height: 1rem;
     border-radius: 0.375rem;
     background: rgb(var(--color-card));
@@ -329,13 +329,11 @@ const nextPost =
     position: absolute;
     right: 0.75rem;
     top: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
-    line-height: 1rem;
-    border-radius: 0.375rem;
-    background: rgba(var(--color-card), 0.88);
-    color: rgb(var(--color-accent));
+    font-size: 0.85rem;
+    line-height: 1.1rem;
+    color: rgba(var(--color-text-base), 0.7);
     font-weight: 700;
+    letter-spacing: 0.08em;
     transition: opacity 120ms ease;
   }
 
@@ -775,7 +773,8 @@ const nextPost =
   /** Attaches copy buttons to code blocks in the document,
    * allowing users to copy code easily. */
   function attachCopyButtons() {
-    const copyButtonLabel = "Copy";
+    const copyIcon = "⧉";
+    const copiedIcon = "✓";
     const codeBlocks = Array.from(document.querySelectorAll("pre"));
 
     const getLanguage = block => {
@@ -793,10 +792,33 @@ const nextPost =
       return "text";
     };
 
-    const formatLanguageLabel = lang =>
-      (lang ?? "text").replace(/[\s_-]+/g, " ").toUpperCase();
+    const formatLanguageLabel = lang => {
+      const key = (lang ?? "text").toLowerCase();
+      const nameMap = {
+        js: "javascript",
+        ts: "typescript",
+        py: "python",
+        rb: "ruby",
+        rs: "rust",
+        sh: "shell",
+        zsh: "shell",
+        bash: "shell",
+        yml: "yaml",
+        md: "markdown",
+        cplusplus: "cpp",
+        cs: "csharp",
+      };
+      const normalized = nameMap[key] ?? key;
+      const cleaned = normalized.replace(/[\s_-]+/g, " ").trim();
+      return (cleaned || "text").toUpperCase();
+    };
 
     for (const codeBlock of codeBlocks) {
+      // avoid double-wrapping if already enhanced
+      if (codeBlock.parentElement?.classList.contains("code-block-wrapper")) {
+        continue;
+      }
+
       const wrapper = document.createElement("div");
       wrapper.className = "code-block-wrapper";
 
@@ -804,7 +826,7 @@ const nextPost =
       copyButton.type = "button";
       copyButton.className = "copy-code";
       copyButton.setAttribute("aria-label", "Copy code");
-      copyButton.innerHTML = copyButtonLabel;
+      copyButton.innerHTML = copyIcon;
       codeBlock.setAttribute("tabindex", "0");
 
       const languageLabel = document.createElement("div");
@@ -820,6 +842,13 @@ const nextPost =
       copyButton.addEventListener("click", async () => {
         await copyCode(codeBlock, copyButton);
       });
+
+      // when pointer leaves, drop button focus so the language label returns
+      wrapper.addEventListener("pointerleave", () => {
+        if (document.activeElement === copyButton) {
+          copyButton.blur();
+        }
+      });
     }
 
     async function copyCode(block, button) {
@@ -829,11 +858,11 @@ const nextPost =
       await navigator.clipboard.writeText(text ?? "");
 
       // visual feedback that task is completed
-      button.innerText = "Copied";
+      button.innerText = copiedIcon;
 
       setTimeout(() => {
-        button.innerText = copyButtonLabel;
-      }, 700);
+        button.innerText = copyIcon;
+      }, 1400);
     }
   }
   attachCopyButtons();
@@ -856,6 +885,7 @@ const nextPost =
     cleanupTocHighlight = initTocHighlight();
     cleanupRevealOnScroll = initRevealOnScroll();
     cleanupImageViewer = initImageViewer();
+    attachCopyButtons();
     schedulePositionToc();
     window.scrollTo({ left: 0, top: 0, behavior: "instant" });
   });
