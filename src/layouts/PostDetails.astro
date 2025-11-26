@@ -254,8 +254,14 @@ const nextPost =
         link => [link.getAttribute("data-toc-slug"), link]
       )
     );
+    const tocItems = new Map(
+      Array.from(
+        document.querySelectorAll("[data-toc-item]"),
+        item => [item.getAttribute("data-toc-item"), item]
+      )
+    );
 
-    if (!articleHeadings.length || tocLinks.size === 0) return;
+    if (!articleHeadings.length || tocLinks.size === 0 || tocItems.size === 0) return;
 
     const parentOf = new Map();
     let lastH2 = null;
@@ -276,12 +282,24 @@ const nextPost =
     const clearActive = () =>
       tocLinks.forEach(link => link.classList.remove("active"));
 
+    const clearOpen = () => tocItems.forEach(item => item.classList.remove("open"));
+
     const markActiveChain = slug => {
       const visited = new Set();
       let current = slug;
       while (current && !visited.has(current)) {
         visited.add(current);
         tocLinks.get(current)?.classList.add("active");
+        current = parentOf.get(current) ?? null;
+      }
+    };
+
+    const markOpenChain = slug => {
+      const visited = new Set();
+      let current = slug;
+      while (current && !visited.has(current)) {
+        visited.add(current);
+        tocItems.get(current)?.classList.add("open");
         current = parentOf.get(current) ?? null;
       }
     };
@@ -305,7 +323,9 @@ const nextPost =
       if (!slug || slug === activeSlug) return;
       activeSlug = slug;
       clearActive();
+      clearOpen();
       markActiveChain(slug);
+      markOpenChain(slug);
     };
 
     const onScroll = () => requestAnimationFrame(updateActive);

@@ -44,7 +44,7 @@ const hasHeadings = tocTree.length > 0;
     <div class="toc-heading">On this page</div>
     <ul class="space-y-1">
       {tocTree.map((section, sectionIndex) => (
-        <li class="group">
+        <li class="group" data-toc-item={section.slug}>
           <a class="toc-link" href={`#${section.slug}`} data-toc-slug={section.slug}>
             <span class="toc-badge">{sectionIndex + 1}</span>
             <span class="toc-text">{section.text}</span>
@@ -53,7 +53,7 @@ const hasHeadings = tocTree.length > 0;
           {section.children.length > 0 && (
             <ul class="toc-children">
               {section.children.map((subsection, subsectionIndex) => (
-                <li class="group">
+                <li class="group" data-toc-item={subsection.slug}>
                   <a
                     class="toc-link toc-sub"
                     href={`#${subsection.slug}`}
@@ -67,7 +67,7 @@ const hasHeadings = tocTree.length > 0;
                   {subsection.children.length > 0 && (
                     <ul class="toc-children">
                       {subsection.children.map((topic, topicIndex) => (
-                        <li>
+                        <li data-toc-item={topic.slug}>
                           <a
                             class="toc-link toc-leaf"
                             href={`#${topic.slug}`}
@@ -155,7 +155,8 @@ const hasHeadings = tocTree.length > 0;
   }
 
   .group:hover > .toc-children,
-  .group:focus-within > .toc-children {
+  .group:focus-within > .toc-children,
+  .open > .toc-children {
     max-height: 120vh;
     opacity: 1;
   }
