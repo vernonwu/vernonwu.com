@@ -93,7 +93,13 @@ const nextPost =
           </button>
         </div>
 
-        <h1 transition:name={slugifyStr(title)} class="post-title">{title}</h1>
+        <h1
+          transition:name={slugifyStr(title)}
+          class="post-title reveal-on-scroll"
+          data-reveal-target
+        >
+          {title}
+        </h1>
         <Datetime
           pubDatetime={pubDatetime}
           modDatetime={modDatetime}
@@ -128,7 +134,9 @@ const nextPost =
           <ShareLinks />
         </div>
 
-        <Comments client:only="react" />
+        <div class="reveal-on-scroll" data-reveal-target>
+          <Comments client:only="react" />
+        </div>
 
         <hr class="my-6 border-dashed" />
 
@@ -205,6 +213,19 @@ const nextPost =
   .post-title {
     @apply text-2xl font-semibold text-skin-accent;
   }
+
+  @media (max-width: 640px) {
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+
+    .reveal-on-scroll.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 </style>
 
 <script is:inline data-astro-rerun>
@@ -244,6 +265,7 @@ const nextPost =
 
   // Highlight current section and subsection in the ToC
   let cleanupTocHighlight;
+  let cleanupRevealOnScroll;
   function initTocHighlight() {
     const articleHeadings = Array.from(
       document.querySelectorAll("#article h2, #article h3, #article h4")
@@ -342,6 +364,56 @@ const nextPost =
   }
   cleanupTocHighlight = initTocHighlight();
 
+  // Reveal selected blocks on scroll for mobile screens
+  function initRevealOnScroll() {
+    const targets = Array.from(document.querySelectorAll("[data-reveal-target]"));
+    if (!targets.length) return;
+
+    const mediaQuery = window.matchMedia("(max-width: 640px)");
+    let observer = null;
+
+    const disconnect = () => observer?.disconnect();
+
+    const showAll = () => {
+      targets.forEach(el => el.classList.add("revealed"));
+    };
+
+    const setupObserver = () => {
+      disconnect();
+      if (!mediaQuery.matches) {
+        showAll();
+        return;
+      }
+
+      observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("revealed");
+              observer?.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
+
+      targets.forEach(el => {
+        // Remove stale visibility when switching breakpoints
+        el.classList.remove("revealed");
+        observer?.observe(el);
+      });
+    };
+
+    setupObserver();
+    mediaQuery.addEventListener("change", setupObserver);
+
+    return () => {
+      disconnect();
+      mediaQuery.removeEventListener("change", setupObserver);
+    };
+  }
+  cleanupRevealOnScroll = initRevealOnScroll();
+
   /** Update the progress bar
    *  when user scrolls */
   function updateScrollProgress() {
@@ -439,7 +511,9 @@ const nextPost =
   /* Go to page start after page swap */
   document.addEventListener("astro:after-swap", () => {
     cleanupTocHighlight?.();
+    cleanupRevealOnScroll?.();
     cleanupTocHighlight = initTocHighlight();
+    cleanupRevealOnScroll = initRevealOnScroll();
     schedulePositionToc();
     window.scrollTo({ left: 0, top: 0, behavior: "instant" });
   });
