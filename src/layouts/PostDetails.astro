@@ -206,12 +206,98 @@ const nextPost =
       </div>
     </div>
   </main>
+  <div
+    id="image-viewer"
+    class="image-viewer"
+    hidden
+    role="dialog"
+    aria-modal="true"
+    aria-label="Image viewer"
+  >
+    <div class="image-viewer__content" role="document">
+      <figure class="image-viewer__figure">
+        <img id="image-viewer-img" class="image-viewer__image" alt="" loading="lazy" />
+      </figure>
+    </div>
+  </div>
   <Footer />
 </Layout>
 
 <style>
   .post-title {
     @apply text-2xl font-semibold text-skin-accent;
+  }
+
+  .image-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: radial-gradient(
+        circle at 20% 20%,
+        rgba(var(--color-fill), 0.9),
+        rgba(var(--color-fill), 0.94)
+      ),
+      linear-gradient(135deg, rgba(var(--color-accent), 0.12), transparent 60%);
+    backdrop-filter: blur(4px);
+  }
+
+  .image-viewer.open {
+    display: flex;
+  }
+
+  :global(body.image-viewer-open) {
+    overflow: hidden;
+  }
+
+  .image-viewer__content {
+    position: relative;
+    width: min(1100px, 96vw);
+    max-height: 90vh;
+    display: grid;
+    gap: 0.75rem;
+    justify-items: center;
+  }
+
+  .image-viewer__figure {
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .image-viewer__image {
+    width: 100%;
+    max-height: 78vh;
+    object-fit: contain;
+    border-radius: 0.75rem;
+    background: rgba(var(--color-card), 0.2);
+    border: 1px solid rgba(var(--color-border), 0.8);
+    box-shadow:
+      0 16px 48px rgba(0, 0, 0, 0.28),
+      0 0 0 1px rgba(var(--color-accent), 0.15);
+    transform-origin: center center;
+    transition: transform 120ms ease;
+    user-select: none;
+    touch-action: none;
+  }
+
+  #article img.zoomable-image {
+    cursor: zoom-in;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+  }
+
+  #article img.zoomable-image:focus-visible {
+    outline: 2px dashed rgb(var(--color-accent));
+    outline-offset: 3px;
+  }
+
+  #article img.zoomable-image:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
   }
 
   @media (max-width: 640px) {
@@ -266,6 +352,7 @@ const nextPost =
   // Highlight current section and subsection in the ToC
   let cleanupTocHighlight;
   let cleanupRevealOnScroll;
+  let cleanupImageViewer;
   function initTocHighlight() {
     const articleHeadings = Array.from(
       document.querySelectorAll("#article h2, #article h3, #article h4")
@@ -414,6 +501,185 @@ const nextPost =
   }
   cleanupRevealOnScroll = initRevealOnScroll();
 
+  // Full-screen image viewer for blog images
+  function initImageViewer() {
+    const viewer = document.getElementById("image-viewer");
+    const viewerImg = document.getElementById("image-viewer-img");
+    if (!viewer || !viewerImg) return;
+    viewerImg.setAttribute("draggable", "false");
+
+    const articleImages = Array.from(document.querySelectorAll("#article img"));
+    if (!articleImages.length) return;
+
+    const listeners = new Map();
+    let activeImage = null;
+    let scale = 1;
+    let translateX = 0;
+    let translateY = 0;
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let dragOriginX = 0;
+    let dragOriginY = 0;
+
+    const applyScale = () => {
+      viewerImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+      const pannable = scale !== 1 || translateX !== 0 || translateY !== 0;
+      viewerImg.style.cursor = pannable ? (isDragging ? "grabbing" : "grab") : "auto";
+    };
+
+    const open = img => {
+      const src = img.getAttribute("src");
+      if (!src) return;
+      activeImage = img;
+      viewerImg.src = src;
+      viewerImg.alt = img.getAttribute("alt") ?? "";
+      scale = 1;
+      translateX = 0;
+      translateY = 0;
+      applyScale();
+      viewer.classList.add("open");
+      viewer.removeAttribute("hidden");
+      document.body.classList.add("image-viewer-open");
+      viewer.tabIndex = -1;
+      viewer.focus({ preventScroll: true });
+    };
+
+    const close = () => {
+      viewer.classList.remove("open");
+      viewer.setAttribute("hidden", "true");
+      viewerImg.src = "";
+      scale = 1;
+      translateX = 0;
+      translateY = 0;
+      applyScale();
+      document.body.classList.remove("image-viewer-open");
+
+      if (activeImage?.isConnected) {
+        activeImage.focus({ preventScroll: true });
+      }
+      activeImage = null;
+    };
+
+    const onBackdropClick = event => {
+      if (event.target === viewer) {
+        close();
+      }
+    };
+
+    const onEsc = event => {
+      if (event.key === "Escape" && viewer.classList.contains("open")) {
+        close();
+      }
+    };
+
+    const onWheel = event => {
+      if (!viewer.classList.contains("open")) return;
+      event.preventDefault();
+      const delta = event.deltaY;
+      const direction = delta > 0 ? -1 : 1;
+      const next = Math.min(4, Math.max(0.75, scale + direction * 0.2));
+      if (next === scale) return;
+      scale = next;
+      applyScale();
+    };
+
+    const onDragStart = event => {
+      event.preventDefault();
+    };
+
+    const onPointerDown = event => {
+      if (!viewer.classList.contains("open")) return;
+      if (event.button !== 0) return;
+      isDragging = true;
+      dragStartX = event.clientX;
+      dragStartY = event.clientY;
+      dragOriginX = translateX;
+      dragOriginY = translateY;
+      viewerImg.setPointerCapture(event.pointerId);
+      applyScale();
+    };
+
+    const onPointerMove = event => {
+      if (!isDragging) return;
+      event.preventDefault();
+      const deltaX = event.clientX - dragStartX;
+      const deltaY = event.clientY - dragStartY;
+      translateX = dragOriginX + deltaX;
+      translateY = dragOriginY + deltaY;
+      applyScale();
+    };
+
+    const endDrag = event => {
+      if (!isDragging) return;
+      isDragging = false;
+      if (event?.pointerId != null) {
+        viewerImg.releasePointerCapture(event.pointerId);
+      }
+      applyScale();
+    };
+
+    articleImages.forEach(img => {
+      const onClick = event => {
+        event?.preventDefault();
+        event?.stopPropagation();
+        open(img);
+      };
+      const onKeyDown = event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          event.stopPropagation();
+          open(img);
+        }
+      };
+
+      const hadTabIndex = img.hasAttribute("tabindex");
+      if (!hadTabIndex) {
+        img.tabIndex = 0;
+      }
+
+      img.classList.add("zoomable-image");
+      img.addEventListener("click", onClick);
+      img.addEventListener("keydown", onKeyDown);
+      listeners.set(img, { onClick, onKeyDown, hadTabIndex });
+    });
+
+    viewer.addEventListener("click", onBackdropClick);
+    viewer.addEventListener("wheel", onWheel, { passive: false });
+    viewerImg.addEventListener("dragstart", onDragStart);
+    viewerImg.addEventListener("pointerdown", onPointerDown);
+    viewerImg.addEventListener("pointermove", onPointerMove);
+    viewerImg.addEventListener("pointerup", endDrag);
+    viewerImg.addEventListener("pointercancel", endDrag);
+    viewerImg.addEventListener("pointerleave", endDrag);
+    document.addEventListener("keydown", onEsc);
+
+    return () => {
+      close();
+      articleImages.forEach(img => {
+        const { onClick, onKeyDown, hadTabIndex } = listeners.get(img) ?? {};
+        if (onClick) img.removeEventListener("click", onClick);
+        if (onKeyDown) img.removeEventListener("keydown", onKeyDown);
+        if (!hadTabIndex && img.tabIndex === 0) {
+          img.removeAttribute("tabindex");
+        }
+        img.classList.remove("zoomable-image");
+      });
+
+      viewer.removeEventListener("click", onBackdropClick);
+      viewer.removeEventListener("wheel", onWheel);
+      viewerImg.removeEventListener("dragstart", onDragStart);
+      viewerImg.removeEventListener("pointerdown", onPointerDown);
+      viewerImg.removeEventListener("pointermove", onPointerMove);
+      viewerImg.removeEventListener("pointerup", endDrag);
+      viewerImg.removeEventListener("pointercancel", endDrag);
+      viewerImg.removeEventListener("pointerleave", endDrag);
+      document.removeEventListener("keydown", onEsc);
+      document.body.classList.remove("image-viewer-open");
+    };
+  }
+  cleanupImageViewer = initImageViewer();
+
   /** Update the progress bar
    *  when user scrolls */
   function updateScrollProgress() {
@@ -512,8 +778,10 @@ const nextPost =
   document.addEventListener("astro:after-swap", () => {
     cleanupTocHighlight?.();
     cleanupRevealOnScroll?.();
+    cleanupImageViewer?.();
     cleanupTocHighlight = initTocHighlight();
     cleanupRevealOnScroll = initRevealOnScroll();
+    cleanupImageViewer = initImageViewer();
     schedulePositionToc();
     window.scrollTo({ left: 0, top: 0, behavior: "instant" });
   });
