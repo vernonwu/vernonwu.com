@@ -50,18 +50,20 @@ const frameHeight = height ?? 0;
   </summary>
 
   <div class="pdf-embed__frame">
-    <iframe
-      src={src}
+    <object
+      data={src}
+      type="application/pdf"
+      role="document"
+      class="pdf-embed__document"
       title={`${displayTitle} (PDF)`}
-      loading="lazy"
-      allowfullscreen
       style={frameHeight ? `--frame-height: ${frameHeight}px;` : undefined}
-    />
-    <p class="pdf-embed__fallback" aria-live="polite">
-      Unable to load the inline viewer?
-      <a href={src} target="_blank" rel="noreferrer">Open in a new tab</a>
-      instead.
-    </p>
+    >
+      <p class="pdf-embed__fallback" aria-live="polite">
+        Unable to load the inline viewer?
+        <a href={src} target="_blank" rel="noreferrer">Open in a new tab</a>
+        instead.
+      </p>
+    </object>
   </div>
 </details>
 
@@ -264,7 +266,7 @@ const frameHeight = height ?? 0;
     opacity: 0.75;
   }
 
-  .pdf-embed iframe {
+  .pdf-embed .pdf-embed__document {
     display: block;
     width: 100%;
     height: var(--frame-height, clamp(420px, 72vh, 1200px));
@@ -277,20 +279,6 @@ const frameHeight = height ?? 0;
       ),
       white;
     filter: drop-shadow(0 28px 42px rgba(0, 0, 0, 0.18));
-  }
-
-  .pdf-embed__fallback {
-    margin: 0;
-    padding: 0.5rem 0.75rem 0.8rem;
-    font-size: 0.92rem;
-    color: rgba(var(--color-text-base), 0.65);
-    display: none; /* hidden by default */
-  }
-
-  .pdf-embed__fallback a {
-    color: rgb(var(--color-accent));
-    text-decoration: underline;
-    text-decoration-style: dashed;
   }
 
   @media (max-width: 640px) {
@@ -313,7 +301,7 @@ const frameHeight = height ?? 0;
       gap: 0.2rem;
     }
 
-    .pdf-embed iframe {
+    .pdf-embed .pdf-embed__document {
       height: var(--frame-height, 70vh);
     }
   }
@@ -369,10 +357,23 @@ const frameHeight = height ?? 0;
     background: linear-gradient(90deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.86));
   }
 
-  .pdf-embed[open] iframe {
+  .pdf-embed[open] .pdf-embed__document {
     height: 100%;
     min-height: 0;
     border-radius: inherit;
     filter: drop-shadow(0 35px 55px rgba(0, 0, 0, 0.26));
+  }
+
+  .pdf-embed__fallback {
+    margin: 0;
+    padding: 0.5rem 0.75rem 0.8rem;
+    font-size: 0.92rem;
+    color: rgba(var(--color-text-base), 0.65);
+  }
+
+  .pdf-embed__fallback a {
+    color: rgb(var(--color-accent));
+    text-decoration: underline;
+    text-decoration-style: dashed;
   }
 </style>
