@@ -1,0 +1,365 @@
+---
+export interface Props {
+  /** Path to the PDF. Place files in `public/` so they are statically served. */
+  src: string;
+  /** Heading shown in the summary and iframe title. Falls back to file name. */
+  title?: string;
+  /** Optional helper text shown in the summary. */
+  description?: string;
+  /** Set to true to have the embed opened by default. */
+  open?: boolean;
+  /** Clamp height of the iframe. Defaults to a responsive value. */
+  height?: number;
+}
+
+const {
+  src,
+  title,
+  description = "Expand to read the PDF.",
+  open = false,
+  height,
+} = Astro.props;
+
+// Only set the `open` attribute when explicitly requested; otherwise the details element remains closed.
+const openAttr = open ? true : undefined;
+
+const derivedName = src
+  .split("/")
+  .filter(Boolean)
+  .pop();
+const displayTitle = title ?? derivedName ?? "Document";
+const frameHeight = height ?? 0;
+---
+
+<details class="pdf-embed" open={openAttr}>
+  <summary class="pdf-embed__summary">
+    <div class="pdf-embed__summary__body">
+      <div class="pdf-embed__badge" aria-hidden="true">PDF</div>
+      <div class="pdf-embed__summary__text">
+        <p class="pdf-embed__title">{displayTitle}</p>
+        <p class="pdf-embed__description">{description}</p>
+      </div>
+    </div>
+    <div class="pdf-embed__summary__cta" aria-hidden="true">
+      <span class="pdf-embed__cta--open">Open reader</span>
+      <span class="pdf-embed__cta--close">Close reader</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+    </div>
+  </summary>
+
+  <div class="pdf-embed__frame">
+    <iframe
+      src={src}
+      title={`${displayTitle} (PDF)`}
+      loading="lazy"
+      allowfullscreen
+      style={frameHeight ? `--frame-height: ${frameHeight}px;` : undefined}
+    />
+    <p class="pdf-embed__fallback" aria-live="polite">
+      Unable to load the inline viewer?
+      <a href={src} target="_blank" rel="noreferrer">Open in a new tab</a>
+      instead.
+    </p>
+  </div>
+</details>
+
+<style>
+  :global(.prose) .pdf-embed {
+    /* Override prose defaults so the embed spans the full post width */
+    display: block;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .pdf-embed {
+    --reader-padding: clamp(0.9rem, 2.1vw, 1.6rem);
+    --reader-sheen: rgba(255, 255, 255, 0.12);
+    --reader-shadow: rgba(0, 0, 0, 0.18);
+    --reader-border: rgba(var(--color-text-base), 0.14);
+    --reader-accent: rgba(var(--color-accent), 0.24);
+    --reader-soft: rgba(var(--color-card), 0.82);
+    display: block;
+    position: relative;
+    border: 1px solid var(--reader-border);
+    border-radius: 1rem;
+    background: radial-gradient(
+        circle at 20% 20%,
+        rgba(var(--color-accent), 0.08),
+        transparent 35%
+      ),
+      linear-gradient(145deg, rgba(var(--color-card), 0.92), rgba(var(--color-fill), 0.75));
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+    padding: 0.4rem;
+    overflow: hidden;
+    color: rgb(var(--color-text-base));
+    transition: transform 200ms ease, box-shadow 200ms ease, border-color 160ms ease,
+      background 160ms ease;
+  }
+
+  .pdf-embed::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(135deg, transparent 25%, var(--reader-sheen) 60%, transparent 90%);
+    mix-blend-mode: soft-light;
+    opacity: 0.7;
+  }
+
+  .pdf-embed:not([open]):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 64px rgba(0, 0, 0, 0.18);
+    border-color: rgba(var(--color-accent), 0.35);
+  }
+
+  .pdf-embed[open] .pdf-embed__summary__cta svg {
+    transform: rotate(180deg);
+  }
+
+  .pdf-embed summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .pdf-embed__summary {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.95rem 1.1rem;
+    border-radius: 0.9rem;
+    cursor: pointer;
+    background: linear-gradient(120deg, rgba(var(--color-card), 0.9), rgba(var(--color-fill), 0.82));
+    border: 1px solid var(--reader-border);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+    transition: background 160ms ease, color 160ms ease, border-color 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .pdf-embed__summary:hover {
+    background: rgba(var(--color-card), 0.76);
+    border-color: rgba(var(--color-accent), 0.3);
+  }
+
+  .pdf-embed__summary:focus-visible {
+    outline: 2px dashed rgb(var(--color-accent));
+    outline-offset: 3px;
+  }
+
+  .pdf-embed__summary__body {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .pdf-embed__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--color-accent), 0.15);
+    color: rgb(var(--color-text-base));
+    border: 1px solid rgba(var(--color-accent), 0.3);
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    padding: 0.35rem 0.55rem;
+  }
+
+  .pdf-embed__title {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .pdf-embed__description {
+    margin: 0.15rem 0 0;
+    opacity: 0.8;
+    font-size: 0.92rem;
+    line-height: 1.4;
+  }
+
+  .pdf-embed__summary__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.6rem;
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: rgb(var(--color-accent));
+    background: rgba(var(--color-accent), 0.16);
+    border: 1px solid rgba(var(--color-accent), 0.35);
+    transition: background 160ms ease, color 160ms ease, border-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .pdf-embed__summary:hover .pdf-embed__summary__cta {
+    background: rgba(var(--color-accent), 0.22);
+    border-color: rgba(var(--color-accent), 0.48);
+  }
+
+  .pdf-embed__summary__cta svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    fill: none;
+    transition: transform 160ms ease;
+  }
+
+  .pdf-embed__cta--close {
+    display: none;
+  }
+
+  .pdf-embed[open] .pdf-embed__cta--open {
+    display: none;
+  }
+
+  .pdf-embed[open] .pdf-embed__cta--close {
+    display: inline;
+  }
+
+  .pdf-embed__frame {
+    position: relative;
+    margin: 0.55rem 0 0;
+    border-radius: 1rem;
+    border: 1px solid rgba(var(--color-text-base), 0.1);
+    overflow: hidden;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.82));
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.14), inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+  }
+
+  .pdf-embed__frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.05), transparent 45%),
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.05),
+        transparent 18%,
+        transparent 82%,
+        rgba(0, 0, 0, 0.05)
+      );
+    mix-blend-mode: multiply;
+    opacity: 0.75;
+  }
+
+  .pdf-embed iframe {
+    display: block;
+    width: 100%;
+    height: var(--frame-height, clamp(420px, 72vh, 1200px));
+    border: none;
+    background: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.04),
+        rgba(255, 255, 255, 0.08) 30%,
+        rgba(0, 0, 0, 0.04)
+      ),
+      white;
+    filter: drop-shadow(0 28px 42px rgba(0, 0, 0, 0.18));
+  }
+
+  .pdf-embed__fallback {
+    margin: 0;
+    padding: 0.5rem 0.75rem 0.8rem;
+    font-size: 0.92rem;
+    color: rgba(var(--color-text-base), 0.65);
+    display: none; /* hidden by default */
+  }
+
+  .pdf-embed__fallback a {
+    color: rgb(var(--color-accent));
+    text-decoration: underline;
+    text-decoration-style: dashed;
+  }
+
+  @media (max-width: 640px) {
+    .pdf-embed__summary {
+      padding: 0.8rem 0.85rem;
+      gap: 0.7rem;
+    }
+
+    .pdf-embed__summary__body {
+      grid-template-columns: 1fr;
+      gap: 0.4rem;
+    }
+
+    .pdf-embed__badge {
+      width: fit-content;
+    }
+
+    .pdf-embed__summary__text {
+      display: grid;
+      gap: 0.2rem;
+    }
+
+    .pdf-embed iframe {
+      height: var(--frame-height, 70vh);
+    }
+  }
+
+  /* Immersive, full-screen reader treatment */
+  .pdf-embed[open] {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 0.9rem;
+    position: fixed;
+    inset: 0;
+    margin: 0;
+    padding: var(--reader-padding);
+    border-radius: 0;
+    border: none;
+    background: radial-gradient(120% 80% at 20% 10%, rgba(var(--color-accent), 0.08), transparent),
+      radial-gradient(120% 80% at 80% 80%, rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.6)),
+      linear-gradient(135deg, rgba(14, 18, 32, 0.82), rgba(6, 8, 14, 0.94));
+    box-shadow: 0 40px 90px rgba(0, 0, 0, 0.42);
+    z-index: 30;
+    overflow: hidden;
+    backdrop-filter: blur(12px) saturate(1.05);
+  }
+
+  .pdf-embed[open]::after {
+    opacity: 0.35;
+  }
+
+  .pdf-embed[open] .pdf-embed__summary {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    border-radius: 0.85rem;
+    background: rgba(var(--color-card), 0.82);
+    border: 1px solid rgba(var(--color-text-base), 0.2);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+  }
+
+  .pdf-embed[open] .pdf-embed__description {
+    display: none;
+  }
+
+  .pdf-embed[open] .pdf-embed__summary__cta {
+    background: rgba(var(--color-accent), 0.16);
+  }
+
+  .pdf-embed[open] .pdf-embed__frame {
+    margin: 0;
+    height: 100%;
+    min-height: 0;
+    border-radius: 1.1rem;
+    box-shadow: 0 40px 82px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(var(--color-text-base), 0.24);
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.86));
+  }
+
+  .pdf-embed[open] iframe {
+    height: 100%;
+    min-height: 0;
+    border-radius: inherit;
+    filter: drop-shadow(0 35px 55px rgba(0, 0, 0, 0.26));
+  }
+</style>
