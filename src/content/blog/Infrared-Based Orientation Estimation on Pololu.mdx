@@ -1,0 +1,36 @@
+---
+title: Infrared-Based Orientation Estimation on Pololu
+author: Vernon Wu
+pubDatetime: 2025-12-02T22:18:00Z
+draft: false
+tags:
+  - Robotics
+  - Infrared
+  - Estimation
+  - Coursework
+description: Coursework paper for an infrared-based orientation estimation approach on Pololu.
+---
+
+import PdfEmbed from "../../components/PdfEmbed.astro";
+
+## Abstract
+
+Accurate orientation estimation is essential for mobile robots, yet common sensing methods such as
+encoders and IMUs accumulate drift over time. As a low-cost alternative that emulates the behaviour
+of an `optical rotary encoder`, this work employs the robot’s built-in `infrared (IR) reflectance sensors`
+together with a custom circular greyscale gradient to infer orientation directly from reflectance
+patterns. Two approaches are evaluated: a mathematical curve-fitting method and a neural network-
+based model. The curve-fitting approach filters IR data using cascaded `Chebyshev Type II` IIR biquads
+and fits a sinusoidal model via the `Levenberg-Marquardt` algorithm, while the `neural network` uses a
+compact multilayer perceptron to perform end-to-end angle prediction. Experimental results show
+that both methods achieve comparable average accuracy, with the neural network offering improved
+performance under darker conditions, whereas the curve-fitting method remains more efficient in
+memory and computation.
+
+## Full Paper
+
+<PdfEmbed
+  src="/pdfs/RSS_Paper.pdf"
+  title="Infrared-Based Orientation Estimation on Pololu"
+  description="Expand to read the full paper."
+/>

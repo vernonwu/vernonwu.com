@@ -1,6 +1,7 @@
 ---
 import { LOCALE, SITE } from "@config";
 import "@styles/base.css";
+import "katex/dist/katex.min.css";
 import { ViewTransitions } from "astro:transitions";
 import BackToTop from "@components/BackToTop.astro";
 import Analytics from "@vercel/analytics/astro";
@@ -137,11 +138,6 @@ const structuredData = {
     <ViewTransitions />
 
     <script is:inline src="/toggle-theme.js" async></script>
-
-    <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
-  />
   </head>
   <body>
     <slot />

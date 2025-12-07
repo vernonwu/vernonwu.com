@@ -128,19 +128,14 @@ const frameHeight = height ?? 0;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.95rem 1.1rem;
-    border-radius: 0.9rem;
+    padding: 0.85rem 1rem;
+    border-radius: 0.7rem;
     cursor: pointer;
-    background: linear-gradient(120deg, rgba(var(--color-card), 0.9), rgba(var(--color-fill), 0.82));
-    border: 1px solid var(--reader-border);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
-    transition: background 160ms ease, color 160ms ease, border-color 160ms ease,
-      box-shadow 160ms ease;
+    transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
   }
 
   .pdf-embed__summary:hover {
     background: rgba(var(--color-card), 0.76);
-    border-color: rgba(var(--color-accent), 0.3);
   }
 
   .pdf-embed__summary:focus-visible {
@@ -159,7 +154,14 @@ const frameHeight = height ?? 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: rgba(var(--color-accent), 0.15);
+    background: linear-gradient(
+      130deg,
+      rgba(var(--color-text-base), 0.07),
+      rgba(var(--color-card), 0.94) 55%,
+      rgba(var(--color-fill), 0.9)
+    );
+    background-size: 200% 200%;
+    background-position: 18% 42%;
     color: rgb(var(--color-text-base));
     border: 1px solid rgba(var(--color-accent), 0.3);
     border-radius: 0.5rem;
@@ -167,6 +169,18 @@ const frameHeight = height ?? 0;
     font-size: 0.85rem;
     letter-spacing: 0.08em;
     padding: 0.35rem 0.55rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transition: background-position 260ms ease, background-color 260ms ease, color 260ms ease,
+      border-color 260ms ease, box-shadow 260ms ease;
+  }
+
+  .pdf-embed__summary:hover .pdf-embed__badge,
+  .pdf-embed[open] .pdf-embed__badge {
+    background-position: 82% 68%;
+    border-color: rgba(var(--color-accent), 0.45);
+    color: rgb(var(--color-accent));
+    box-shadow: 0 8px 18px rgba(var(--color-accent), 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
   }
 
   .pdf-embed__title {
@@ -334,7 +348,6 @@ const frameHeight = height ?? 0;
     z-index: 2;
     border-radius: 0.85rem;
     background: rgba(var(--color-card), 0.82);
-    border: 1px solid rgba(var(--color-text-base), 0.2);
     box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
   }
 
