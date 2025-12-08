@@ -31,7 +31,10 @@ const { props } = Astro;
       <h1>{props.pageTitle}</h1>
     )
   }
-  <p>{props.pageDesc}</p>
+  <div class="page-lede">
+    <p>{props.pageDesc}</p>
+    <slot name="header-right" />
+  </div>
   <slot />
 </main>
 
@@ -42,7 +45,10 @@ const { props } = Astro;
   #main-content h1 {
     @apply text-2xl font-semibold sm:text-3xl;
   }
+  .page-lede {
+    @apply mb-6 mt-2 flex flex-wrap items-center justify-between gap-4;
+  }
   #main-content p {
-    @apply mb-6 mt-2 italic;
+    @apply italic;
   }
 </style>
