@@ -14,6 +14,8 @@ type MALItem = {
     num_episodes_watched?: number;
     num_chapters_read?: number;
     tags?: string[];
+    start_date?: string;
+    finish_date?: string;
   };
 };
 
@@ -38,6 +40,8 @@ export type CollectionItem = {
   mediaType?: string;
   typeCategory: "TV" | "Movie" | "Manga" | "Other";
   tags?: string[];
+  startDate?: string;
+  finishDate?: string;
 };
 
 export type CollectionFetchResult = {
@@ -87,6 +91,12 @@ function mapItems(kind: "anime" | "manga", data?: MALItem[]): CollectionItem[] {
         kind === "anime"
           ? `${list_status?.num_episodes_watched ?? 0} eps`
           : `${list_status?.num_chapters_read ?? 0} ch`;
+      const startDate = list_status?.start_date
+        ? new Date(list_status.start_date).toISOString()
+        : undefined;
+      const finishDate = list_status?.finish_date
+        ? new Date(list_status.finish_date).toISOString()
+        : undefined;
 
       return {
         id: node.id,
@@ -102,6 +112,8 @@ function mapItems(kind: "anime" | "manga", data?: MALItem[]): CollectionItem[] {
         mediaType: node.media_type,
         typeCategory,
         tags: list_status?.tags?.filter(Boolean),
+        startDate,
+        finishDate,
       } satisfies CollectionItem;
     }) ?? []
   );
@@ -120,8 +132,8 @@ export async function fetchMalList(
 
   const fields =
     kind === "anime"
-      ? "list_status{status,score,num_episodes_watched,tags},media_type,alternative_titles{ja}"
-      : "list_status{status,score,num_chapters_read,tags},media_type,alternative_titles{ja}";
+      ? "list_status{status,score,num_episodes_watched,tags,start_date,finish_date},media_type,alternative_titles{ja}"
+      : "list_status{status,score,num_chapters_read,tags,start_date,finish_date},media_type,alternative_titles{ja}";
 
   const params = new URLSearchParams({
     limit: limit.toString(),
