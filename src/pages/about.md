@@ -1,10 +1,8 @@
 ---
 layout: ../layouts/AboutLayout.astro
 title: "About"
+description: "Programmer, researcher, idealist, fiction & anime enjoyer, human."
 ---
-
-Programmer, researcher, idealist, fiction & anime enjoyer, human.
-
 Fyi, [my anime list](https://myanimelist.net/animelist/WingsOFreedom).
 
 ![nozomi](../../public/nozomi.jpg)
