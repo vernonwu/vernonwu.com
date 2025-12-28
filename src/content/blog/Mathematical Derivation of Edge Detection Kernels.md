@@ -25,11 +25,11 @@ description: 常见卷积算子的数学推导。
 对其进行n次自卷积运算, 有：
 
 $$
-\begin{aligned} K_{\text{tri}}^{n} &= \underbrace{K_{\text{box}}* K_{\text{box}} \cdots* K_{\text{box}}}_{n\text{ times}} \\ &= [C(n,0), C(n,1), C(n,2), \ldots, C(n,n)] \end{aligned}
+\begin{aligned} K_{n} &= \underbrace{K_{\text{box}}* K_{\text{box}} \cdots* K_{\text{box}}}_{n\text{ times}} \\ &= [C(n,0), C(n,1), C(n,2), \ldots, C(n,n)] \end{aligned}
 $$
 
 其中 $C(n,k)$ 为二项式系数。
-根据**中心极限定理**，当 $n \to \infty$ 时，$K_{\text{tri}}^{n}$收敛于一维高斯分布, 因此可用其近似高斯平滑。
+根据**中心极限定理**，当 $n \to \infty$ 时，$K_{n}$收敛于一维高斯分布, 因此可用其近似高斯平滑。
 
 ---
 
@@ -37,7 +37,7 @@ $$
 
 高斯函数具有**可分离性（Separability）**，即 $G_{\sigma}(x,y) = G_{\sigma}(x) \cdot G_{\sigma}(y)$。这允许我们将两个一维核通过向量外积生成二维核。
 
-以最常用的 $3 \times 3$ 高斯核为例，使用 $K_{\text{tri}}^{2} = [1, 2, 1]$ 作为基底：
+以最常用的 $3 \times 3$ 高斯核为例，使用 $K_2 = [1, 2, 1]$ 作为基底：
 
 $$
 G_{\sigma} = \frac{1}{16} \begin{bmatrix} 1 \\ 2 \\ 1 \end{bmatrix} \times \begin{bmatrix} 1 & 2 & 1 \end{bmatrix} = \frac{1}{16} \begin{bmatrix} 1 & 2 & 1 \\ 2 & 4 & 2 \\ 1 & 2 & 1 \end{bmatrix}
