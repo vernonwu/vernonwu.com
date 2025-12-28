@@ -1,8 +1,8 @@
 ---
-title: Mathematical Derivation of Common Convolution Kernels
+title: Mathematical Derivation of Edge Detection Kernels
 author: Vernon Wu
 pubDatetime: 2025-12-28T22:22:00Z
-slug: convolution-kernels
+slug: edge-detection-kernels
 featured: false
 ogImage: /assets/nozomi.jpg
 tags:
@@ -232,6 +232,6 @@ $$
 
 ## References
 
->[1] Marr, David, and Ellen Hildreth. "Theory of edge detection." Proceedings of the Royal Society of London. Series B. Biological Sciences 207.1167 (1980): 187-217.
+> [1] Marr, David, and Ellen Hildreth. "Theory of edge detection." Proceedings of the Royal Society of London. Series B. Biological Sciences 207.1167 (1980): 187-217.
 
->[2] Torre, Vincent, and Tomaso A. Poggio. "On edge detection." IEEE Transactions on Pattern Analysis and Machine Intelligence 2 (1986): 147-163.
+> [2] Torre, Vincent, and Tomaso A. Poggio. "On edge detection." IEEE Transactions on Pattern Analysis and Machine Intelligence 2 (1986): 147-163.
