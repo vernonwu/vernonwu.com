@@ -1,7 +1,7 @@
 ---
 title: Mathematical Derivation of Common Convolution Kernels
 author: Vernon Wu
-pubDatetime: 2024-04-14T13:32:00Z
+pubDatetime: 2025-12-28T22:22:00Z
 slug: convolution-kernels
 featured: false
 ogImage: /assets/nozomi.jpg
