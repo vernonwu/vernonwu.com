@@ -1,7 +1,7 @@
 ---
 title: Mathematical Derivation of Edge Detection Kernels
 author: Vernon Wu
-pubDatetime: 2025-12-28T21:22:00Z
+pubDatetime: 2025-12-25T22:22:00Z
 slug: edge-detection-kernels
 featured: false
 draft: false
