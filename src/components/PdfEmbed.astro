@@ -20,13 +20,24 @@ const {
   height,
 } = Astro.props;
 
+// Serve PDFs from CDN when a non-HTTP source is provided. This mirrors the
+// blog's approach of hosting PDFs on the `picx-images-hosting` repo via
+// `cdn.laplacian.net`. If the author passes an absolute URL (http/https),
+// we use it unchanged.
+const CDN_BASE =
+  "https://cdn.laplacian.net/gh/vernonwu/picx-images-hosting@master";
+const cdnSrc = (() => {
+  if (!src) return src;
+  const trimmed = String(src).trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (trimmed.startsWith("/")) return `${CDN_BASE}${trimmed}`;
+  return `${CDN_BASE}/${trimmed}`;
+})();
+
 // Only set the `open` attribute when explicitly requested; otherwise the details element remains closed.
 const openAttr = open ? true : undefined;
 
-const derivedName = src
-  .split("/")
-  .filter(Boolean)
-  .pop();
+const derivedName = src.split("/").filter(Boolean).pop();
 const displayTitle = title ?? derivedName ?? "Document";
 const frameHeight = height ?? 0;
 ---
@@ -44,14 +55,14 @@ const frameHeight = height ?? 0;
       <span class="pdf-embed__cta--open">Open reader</span>
       <span class="pdf-embed__cta--close">Close reader</span>
       <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M6 9l6 6 6-6" />
+        <path d="M6 9l6 6 6-6"></path>
       </svg>
     </div>
   </summary>
 
   <div class="pdf-embed__frame">
     <object
-      data={src}
+      data={cdnSrc}
       type="application/pdf"
       role="document"
       class="pdf-embed__document"
@@ -60,7 +71,7 @@ const frameHeight = height ?? 0;
     >
       <p class="pdf-embed__fallback" aria-live="polite">
         Unable to load the inline viewer?
-        <a href={src} target="_blank" rel="noreferrer">Open in a new tab</a>
+        <a href={cdnSrc} target="_blank" rel="noreferrer">Open in a new tab</a>
         instead.
       </p>
     </object>
@@ -86,17 +97,25 @@ const frameHeight = height ?? 0;
     position: relative;
     border: 1px solid var(--reader-border);
     border-radius: 1rem;
-    background: radial-gradient(
+    background:
+      radial-gradient(
         circle at 20% 20%,
         rgba(var(--color-accent), 0.08),
         transparent 35%
       ),
-      linear-gradient(145deg, rgba(var(--color-card), 0.92), rgba(var(--color-fill), 0.75));
+      linear-gradient(
+        145deg,
+        rgba(var(--color-card), 0.92),
+        rgba(var(--color-fill), 0.75)
+      );
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
     padding: 0.4rem;
     overflow: hidden;
     color: rgb(var(--color-text-base));
-    transition: transform 200ms ease, box-shadow 200ms ease, border-color 160ms ease,
+    transition:
+      transform 200ms ease,
+      box-shadow 200ms ease,
+      border-color 160ms ease,
       background 160ms ease;
   }
 
@@ -105,7 +124,12 @@ const frameHeight = height ?? 0;
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: linear-gradient(135deg, transparent 25%, var(--reader-sheen) 60%, transparent 90%);
+    background: linear-gradient(
+      135deg,
+      transparent 25%,
+      var(--reader-sheen) 60%,
+      transparent 90%
+    );
     mix-blend-mode: soft-light;
     opacity: 0.7;
   }
@@ -133,7 +157,10 @@ const frameHeight = height ?? 0;
     padding: 0.85rem 1rem;
     border-radius: 0.7rem;
     cursor: pointer;
-    transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+    transition:
+      background 160ms ease,
+      color 160ms ease,
+      border-color 160ms ease;
   }
 
   .pdf-embed__summary:hover {
@@ -172,8 +199,12 @@ const frameHeight = height ?? 0;
     letter-spacing: 0.08em;
     padding: 0.35rem 0.55rem;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    transition: background-position 260ms ease, background-color 260ms ease, color 260ms ease,
-      border-color 260ms ease, box-shadow 260ms ease;
+    transition:
+      background-position 260ms ease,
+      background-color 260ms ease,
+      color 260ms ease,
+      border-color 260ms ease,
+      box-shadow 260ms ease;
   }
 
   .pdf-embed__summary:hover .pdf-embed__badge,
@@ -181,7 +212,8 @@ const frameHeight = height ?? 0;
     background-position: 82% 68%;
     border-color: rgba(var(--color-accent), 0.45);
     color: rgb(var(--color-accent));
-    box-shadow: 0 8px 18px rgba(var(--color-accent), 0.24),
+    box-shadow:
+      0 8px 18px rgba(var(--color-accent), 0.24),
       inset 0 1px 0 rgba(255, 255, 255, 0.18);
   }
 
@@ -209,7 +241,10 @@ const frameHeight = height ?? 0;
     color: rgb(var(--color-accent));
     background: rgba(var(--color-accent), 0.16);
     border: 1px solid rgba(var(--color-accent), 0.35);
-    transition: background 160ms ease, color 160ms ease, border-color 160ms ease,
+    transition:
+      background 160ms ease,
+      color 160ms ease,
+      border-color 160ms ease,
       transform 160ms ease;
   }
 
@@ -245,8 +280,14 @@ const frameHeight = height ?? 0;
     border-radius: 1rem;
     border: 1px solid rgba(var(--color-text-base), 0.1);
     overflow: hidden;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.82));
-    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.14), inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.9),
+      rgba(255, 255, 255, 0.82)
+    );
+    box-shadow:
+      0 22px 48px rgba(0, 0, 0, 0.14),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.25);
   }
 
   .pdf-embed__frame::before {
@@ -254,7 +295,8 @@ const frameHeight = height ?? 0;
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.05), transparent 45%),
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.05), transparent 45%),
       linear-gradient(
         90deg,
         rgba(0, 0, 0, 0.05),
@@ -271,7 +313,8 @@ const frameHeight = height ?? 0;
     width: 100%;
     height: var(--frame-height, clamp(420px, 72vh, 1200px));
     border: none;
-    background: linear-gradient(
+    background:
+      linear-gradient(
         to right,
         rgba(0, 0, 0, 0.04),
         rgba(255, 255, 255, 0.08) 30%,
@@ -317,8 +360,17 @@ const frameHeight = height ?? 0;
     padding: var(--reader-padding);
     border-radius: 0;
     border: none;
-    background: radial-gradient(120% 80% at 20% 10%, rgba(var(--color-accent), 0.08), transparent),
-      radial-gradient(120% 80% at 80% 80%, rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.6)),
+    background:
+      radial-gradient(
+        120% 80% at 20% 10%,
+        rgba(var(--color-accent), 0.08),
+        transparent
+      ),
+      radial-gradient(
+        120% 80% at 80% 80%,
+        rgba(0, 0, 0, 0.32),
+        rgba(0, 0, 0, 0.6)
+      ),
       linear-gradient(135deg, rgba(14, 18, 32, 0.82), rgba(6, 8, 14, 0.94));
     box-shadow: 0 40px 90px rgba(0, 0, 0, 0.42);
     z-index: 30;
@@ -352,9 +404,15 @@ const frameHeight = height ?? 0;
     height: 100%;
     min-height: 0;
     border-radius: 1.1rem;
-    box-shadow: 0 40px 82px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    box-shadow:
+      0 40px 82px rgba(0, 0, 0, 0.38),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(var(--color-text-base), 0.24);
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.86));
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.92),
+      rgba(255, 255, 255, 0.86)
+    );
   }
 
   .pdf-embed[open] .pdf-embed__document {
