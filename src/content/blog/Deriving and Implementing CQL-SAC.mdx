@@ -71,7 +71,7 @@ $$
 Q^*(s, a)=\underset{s^{\prime} \sim P}{\mathrm{E}}\left[r(s, a)+\gamma \max _{a^{\prime}} Q^*\left(s^{\prime}, a^{\prime}\right)\right]
 $$
 
-With sampled trajectories $(s,a,r,s’,d)$ stored in replay buffer $\mathcal{D},$ we learn an approximator to $Q^*(s, a)$ with neural network $Q_\phi(s, a).$
+With sampled trajectories $(s,a,r,s',d)$ stored in replay buffer $\mathcal{D},$ we learn an approximator to $Q^*(s, a)$ with neural network $Q_\phi(s, a).$
 
 The mean squared Bellman Error (**MSBE**) is computed as:
 
@@ -79,7 +79,7 @@ $$
 L(\phi, \mathcal{D})=\underset{\left(s, a, r, s^{\prime}, d\right) \sim \mathcal{D}}{\mathrm{E}}\left[\left(Q_\phi(s, a)-\left(r+\gamma(1-d) \max _{a^{\prime}} Q_\phi\left(s^{\prime}, a^{\prime}\right)\right)\right)^2\right]
 $$
 
-where $d=1$ if $s’$ is a terminal state and $0$ otherwise.
+where $d=1$ if $s'$ is a terminal state and $0$ otherwise.
 
 #### **Target Networks**
 
@@ -131,7 +131,7 @@ $$
 
 ## CQL-SAC
 
-Since we’re trying to do offline-online combined updates for performance improvement, we need to tackle with the offline reinforcement learning problem with generated samples. From prior works regarding offline RL [6][7], OOD actions and function approximation errors will pose problems for Q function estimation. Therefore, we adopt conservative Q-learning method proposed by prior work [8] to address this issue.
+Since we are trying to do offline-online combined updates for performance improvement, we need to tackle with the offline reinforcement learning problem with generated samples. From prior works regarding offline RL [6][7], OOD actions and function approximation errors will pose problems for Q function estimation. Therefore, we adopt conservative Q-learning method proposed by prior work [8] to address this issue.
 
 ### Conservative Off-Policy Evaluation
 
@@ -157,7 +157,7 @@ $$
 \text{min}_Q\text{max}_\mu \alpha (\mathbb{E}_{s\sim\mathcal D^\beta,a\sim \mu(a|s)}[Q(s,a)]-\mathbb{E}_{s\sim\mathcal D^\beta,a\sim \pi^\beta(a|s)}[Q(s,a)])+\frac{1}{2}\mathbb{E}_{s,a,s'\sim \mathcal D^\beta}[(Q(s,a)-\hat{\mathcal B}^{\pi_k}\hat Q^k(s,a))^2]+\mathcal{R}(\mu)
 $$
 
-Since we’re utilizing CQL-SAC, we will chose the regularizer as the entropy $H$, making it $CQL(H)$. In this case, the optimization problem will be reduced as:
+Since we are utilizing CQL-SAC, we will chose the regularizer as the entropy $H$, making it $CQL(H)$. In this case, the optimization problem will be reduced as:
 
 $$
 \text{min}_Q \alpha \mathbb{E}_{s\sim\mathcal{D}^\beta}(\log\sum_a\exp(Q(s,a))-\mathbb{E}_{s\sim\mathcal D^\beta,a\sim \pi^\beta(a|s)}[Q(s,a)])+\frac{1}{2}\mathbb{E}_{s,a,s'\sim \mathcal D^\beta}[(Q(s,a)-\hat{\mathcal B}^{\pi_k}\hat Q^k(s,a))^2]
@@ -188,7 +188,7 @@ The overall pipeline is visualized below:
 For an implementation of the CQL-SAC algorithm, please refer to our [Github repo](https://github.com/TobyLeelsz/offline-online-combine-training/tree/main).
 
 <PdfEmbed
-  src="/pdfs/CQL-SAC.pdf"
+  src="https://cdn.laplacian.net/gh/vernonwu/picx-images-hosting@master/20260101/CQL-SAC.pdf"
   title="Online-offline combined training for CQL-SAC"
   description="Expand to read the full paper."
 />
