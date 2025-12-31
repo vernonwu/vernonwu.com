@@ -1,5 +1,5 @@
 ---
-title: Deriving CQL-SAC
+title: Deriving and Implementing CQL-SAC
 author: Vernon Wu
 pubDatetime: 2024-04-20T09:17:43Z
 slug: CQL-SAC
@@ -9,8 +9,9 @@ ogImage: /assets/nozomi.jpg
 tags:
   - Reinforcement Learning
   - Machine Learning
+  - Maths
   - Algorithm
-description: A brief derivation of the CQL-SAC algorithm.
+description: Brief derivation of the CQL-SAC algorithm and its implementation in Gymnasium.
 ---
 
 > Readers are recommended to have prior knowledge for Reinforcement Learning basics. A good tutorial can be found [here](https://spinningup.openai.com/en/latest/).
@@ -21,7 +22,7 @@ description: A brief derivation of the CQL-SAC algorithm.
 
 ## Policy Gradient
 
-Following stochastic parameterized policy $\pi_\theta$,  we can sample trajectory $\tau.$ The aim is to maximize the expected return $J\left(\pi_\theta\right)=\underset{\tau \sim \pi_\theta}{\mathrm{E}}[R(\tau)].$ We aim to update $\theta$ via gradient descent $\theta_{k+1}=\theta_k+\left.\alpha \nabla_\theta J\left(\pi_\theta\right)\right|_{\theta_k}.$
+Following stochastic parameterized policy $\pi_\theta$, we can sample trajectory $\tau.$ The aim is to maximize the expected return $J\left(\pi_\theta\right)=\underset{\tau \sim \pi_\theta}{\mathrm{E}}[R(\tau)].$ We aim to update $\theta$ via gradient descent $\theta_{k+1}=\theta_k+\left.\alpha \nabla_\theta J\left(\pi_\theta\right)\right|_{\theta_k}.$
 
 The gradient $\nabla_\theta J\left(\pi_\theta\right)$ can be expanded into:
 
@@ -92,7 +93,7 @@ $\phi_{\operatorname{targ}} \leftarrow \rho \phi_{\operatorname{targ}}+(1-\rho) 
 
 ### **Clipped double-Q**
 
-To further suppress Q-values,  in SAC we learn *two* Q-functions instead of one, regressing both sets of parameter $\phi$ with a shared target, calculated with the smaller Q-value of the two:
+To further suppress Q-values, in SAC we learn *two* Q-functions instead of one, regressing both sets of parameter $\phi$ with a shared target, calculated with the smaller Q-value of the two:
 
 $$
 \begin{aligned} & y\left(r, s^{\prime}, d\right)=r+\gamma(1-d) \min _{i=1,2}\left(  \max _{a^{\prime}} Q_{\phi_{i, \operatorname{targ}}}\left(s^{\prime}, a^{\prime}\right)\right), \\ & L\left(\phi_i, \mathcal{D}\right)=\operatorname{E}_{\left(s, a, r, s^{\prime}, d\right) \sim \mathcal{D}}\left[\left(Q_{\phi_i}(s, a)-y\left(r, s^{\prime}, d\right)\right)^2\right].\end{aligned}
@@ -100,7 +101,7 @@ $$
 
 ## Policy Learning Side
 
-Since calculating $\max _{a} Q_{\phi}(s,a)$  is expensive, we can approximate it with $\max _a Q(s, a) \approx Q_{\phi}(s, \mu_{\theta_{\operatorname{targ}}}(s)),$ where $\mu_{\theta_{\operatorname{targ}}}$ is the target policy. The objective then becomes to learning a policy that maximizes $Q_\phi(s, a):\max _\theta \underset{s \sim \mathcal{D}}{\mathrm{E}}\left[Q_\phi\left(s, \mu_\theta(s)\right)\right].$
+Since calculating $\max _{a} Q_{\phi}(s,a)$ is expensive, we can approximate it with $\max _a Q(s, a) \approx Q_{\phi}(s, \mu_{\theta_{\operatorname{targ}}}(s)),$ where $\mu_{\theta_{\operatorname{targ}}}$ is the target policy. The objective then becomes to learning a policy that maximizes $Q_\phi(s, a):\max _\theta \underset{s \sim \mathcal{D}}{\mathrm{E}}\left[Q_\phi\left(s, \mu_\theta(s)\right)\right].$
 
 Here we adopt a squashed state-dependent gaussian policy:
 
@@ -128,7 +129,7 @@ $$
 
 ## CQL-SAC
 
-Since we’re trying to do offline-online combined updates for performance improvement, we need to tackle with the offline reinforcement learning problem with  generated samples. From prior works regarding offline RL [6][7], OOD actions and function approximation errors will pose problems for Q function estimation. Therefore, we adopt conservative Q-learning method proposed by prior work [8] to address this issue.
+Since we’re trying to do offline-online combined updates for performance improvement, we need to tackle with the offline reinforcement learning problem with generated samples. From prior works regarding offline RL [6][7], OOD actions and function approximation errors will pose problems for Q function estimation. Therefore, we adopt conservative Q-learning method proposed by prior work [8] to address this issue.
 
 ### Conservative Off-Policy Evaluation
 
@@ -193,4 +194,4 @@ For an implementation of the CQL-SAC algorithm, please refer to our [Github repo
 
 [7] Aviral Kumar, Justin Fu, Matthew Soh, George Tucker, and Sergey Levine. Stabilizing off-policy q-learning via bootstrapping error reduction. In Advances in Neural Information Processing Systems, pages 11761–11771, 2019.
 
-[8]Aviral Kumar, Aurick Zhou, George Tucker and Sergey Levine. Conservative q-learning for offline reinforcement learning.  In Advances in Neural Information Processing Systems, 2020.
+[8]Aviral Kumar, Aurick Zhou, George Tucker and Sergey Levine. Conservative q-learning for offline reinforcement learning. In Advances in Neural Information Processing Systems, 2020.
