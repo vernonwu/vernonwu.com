@@ -14,6 +14,8 @@ tags:
 description: Brief derivation of the CQL-SAC algorithm and its implementation in Gymnasium.
 ---
 
+import PdfEmbed from "../../components/PdfEmbed.astro";
+
 > Readers are recommended to have prior knowledge for Reinforcement Learning basics. A good tutorial can be found [here](https://spinningup.openai.com/en/latest/).
 
 ## Introduction
@@ -167,7 +169,11 @@ More specifically, we let the regularizer $\mathcal{R}(\mu)=-D_{KL}(\mu,\rho)$, 
 
 Architecture for SAC and its CQL-modified version is illustrated as follows:
 
- <img src="https://s2.loli.net/2024/10/15/WsXDn43iybBVadL.png" alt="CQL-SAC.png" width="80%"/>
+<img
+  src="https://s2.loli.net/2024/10/15/WsXDn43iybBVadL.png"
+  alt="CQL-SAC.png"
+  width="80%"
+/>
 
 The overall pipeline is visualized below:
 
@@ -180,6 +186,12 @@ The overall pipeline is visualized below:
 ## Implementation
 
 For an implementation of the CQL-SAC algorithm, please refer to our [Github repo](https://github.com/TobyLeelsz/offline-online-combine-training/tree/main).
+
+<PdfEmbed
+  src="/pdfs/CQL-SAC.pdf"
+  title="Online-offline combined training for CQL-SAC on Lunar Lander"
+  description="Expand to read the full paper."
+/>
 
 ## References
 
