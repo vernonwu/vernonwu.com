@@ -42,7 +42,7 @@ const displayTitle = title ?? derivedName ?? "Document";
 const frameHeight = height ?? 0;
 ---
 
-<details class="pdf-embed" open={openAttr}>
+<details class="pdf-embed" open={openAttr} data-pdf-src={cdnSrc}>
   <summary class="pdf-embed__summary">
     <div class="pdf-embed__summary__body">
       <div class="pdf-embed__badge" aria-hidden="true">PDF</div>
@@ -78,6 +78,51 @@ const frameHeight = height ?? 0;
   </div>
 </details>
 
+<script>
+  // @ts-nocheck
+  (function () {
+    // Find the nearest pdf-embed container (script is placed directly after it).
+    const container =
+      document.currentScript && document.currentScript.previousElementSibling;
+    const src =
+      container &&
+      container.getAttribute &&
+      container.getAttribute("data-pdf-src");
+    if (!src) return;
+
+    window.__pdf_embeds = window.__pdf_embeds || [];
+    window.__pdf_embeds.push(src);
+
+    if (window.__pdf_embeds._scheduled) return;
+    window.__pdf_embeds._scheduled = true;
+
+    function doPreload() {
+      try {
+        const seen = new Set();
+        (window.__pdf_embeds || []).forEach(function (u) {
+          if (!u || seen.has(u)) return;
+          seen.add(u);
+          var link = document.createElement("link");
+          link.rel = "preload";
+          link.as = "document";
+          link.href = u;
+          document.head.appendChild(link);
+        });
+      } catch (e) {
+        // noop
+      }
+    }
+
+    if (
+      document.readyState === "complete" ||
+      document.readyState === "interactive"
+    ) {
+      setTimeout(doPreload, 0);
+    } else {
+      window.addEventListener("DOMContentLoaded", doPreload, { once: true });
+    }
+  })();
+</script>
 <style>
   :global(.prose) .pdf-embed {
     /* Override prose defaults so the embed spans the full post width */
