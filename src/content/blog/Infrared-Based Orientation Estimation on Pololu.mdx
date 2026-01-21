@@ -1,36 +1,26 @@
 ---
-title: Infrared-Based Orientation Estimation on Pololu
+title: Revisiting Temporal Difference Learning
 author: Vernon Wu
-pubDatetime: 2025-12-02T22:18:00Z
+pubDatetime: 2024-04-16T23:10:00Z
 draft: false
-slug: pololu
+slug: revisiting-td-learning
 tags:
-  - Robotics
-  - Infrared
-  - Estimation
+  - Reinforcement Learning
+  - Temporal Difference
   - Coursework
-description: Coursework paper for an infrared-based orientation estimation approach on Pololu.
+  - Maths
+description: Replicating and extending experiments from Sutton's original TD learning paper on the random walk prediction problem.
 ---
 
 import PdfEmbed from "../../components/PdfEmbed.astro";
 
 ## Abstract
 
-Accurate orientation estimation is essential for mobile robots, yet common sensing methods such as
-encoders and IMUs accumulate drift over time. As a low-cost alternative that emulates the behaviour
-of an `optical rotary encoder`, this work employs the robot’s built-in `infrared (IR) reflectance sensors`
-together with a custom circular greyscale gradient to infer orientation directly from reflectance
-patterns. Two approaches are evaluated: a mathematical curve-fitting method and a neural network-
-based model. The curve-fitting approach filters IR data using cascaded `Chebyshev Type II` IIR biquads
-and fits a sinusoidal model via the `Levenberg-Marquardt` algorithm, while the `neural network` uses a
-compact multilayer perceptron to perform end-to-end angle prediction. Experimental results show
-that both methods achieve comparable average accuracy, with the neural network offering improved
-performance under darker conditions, whereas the curve-fitting method remains more efficient in
-memory and computation.
+This report revisits Richard S. Sutton's seminal $\mathrm{TD}(\lambda)$ methods by replicating the experiments from his 1988 paper on the random walk prediction problem. We evaluate the robustness and applicability of TD learning through a comparative analysis of supervised learning and $\operatorname{TD}(\lambda)$ strategies. Our findings confirm the efficacy of $\operatorname{TD}(\lambda)$ in learning from temporal differences and adapting to partial information. Adjustments in learning parameters like rate and convergence thresholds highlight their impact on learning outcomes, especially the influence of $\lambda$ values on prediction accuracy and efficiency. This study supports the foundational principles of TD learning and corroborates its relevance through rigorous empirical validation.
 
 ## Full Paper
 
 <PdfEmbed
-  src="https://cdn.laplacian.net/gh/vernonwu/picx-images-hosting@master/20260101/RSS-Paper.pdf"
-  title="Infrared-Based Orientation Estimation on Pololu"
+  src="https://cdn.laplacian.net/gh/vernonwu/picx-images-hosting@master/20260101/sutton1988_report.pdf"
+  title="Revisiting Temporal Difference Learning"
 />
