@@ -61,6 +61,12 @@ module.exports = {
         }
       },
       fontFamily: {
+        latex: [
+          '"New Computer Modern"',
+          '"Source Han Serif SC"',
+          '"Noto Serif CJK SC"',
+          'serif'
+        ],
         mono: ["IBM Plex Mono", "monospace"],
       },
 

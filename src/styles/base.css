@@ -2,6 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("https://cdn.laplacian.net/gh/vernonwu/picx-images-hosting@master/20260101/NewCM10-Book.otf")
+    format("opentype");
+}
+
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("https://cdn.laplacian.net/gh/vernonwu/picx-images-hosting@master/20260101/NewCM10-BookItalic.otf")
+    format("opentype");
+}
+
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("https://cdn.laplacian.net/gh/vernonwu/picx-images-hosting@master/20260101/NewCM10-Bold.otf")
+    format("opentype");
+}
+
+@font-face {
+  font-family: "New Computer Modern";
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url("https://cdn.laplacian.net/gh/vernonwu/picx-images-hosting@master/20260101/NewCM10-BoldItalic.otf")
+    format("opentype");
+}
+
+@font-face {
+  font-family: "Source Han Serif SC";
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url("https://cdn.laplacian.net/gh/vernonwu/picx-images-hosting@master/20260101/SourceHanSerifSC-VF.otf.woff2")
+    format("woff2");
+  unicode-range:
+    U+2000-206F, U+2E00-2E7F, U+3000-303F, U+3400-4DB5, U+4E00-9FFF,
+    U+F900-FAFF, U+FF00-FFEF;
+}
+
 @layer base {
   :root,
   html[data-theme="light"] {
@@ -29,7 +77,7 @@
     display: block;
   }
   body {
-    @apply flex min-h-[100svh] flex-col bg-skin-fill font-mono text-skin-base selection:bg-skin-accent/70 selection:text-skin-inverted;
+    @apply font-latex flex min-h-[100svh] flex-col bg-skin-fill text-skin-base selection:bg-skin-accent/70 selection:text-skin-inverted;
   }
   section,
   footer {
@@ -134,7 +182,7 @@
   }
 }
 
-.katex-display{
+.katex-display {
   min-height: 100%;
   width: 100%;
   overflow-x: auto;
