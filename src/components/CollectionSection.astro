@@ -122,9 +122,9 @@ const statusFilters = [
                     <div class="title-overlay">
                       <div class="title-text">{item.title}</div>
                     </div>
-                    {item.tags?.length ? (
-                      <div class="tags-overlay" title={item.tags.join(", ")}>
-                        <div class="tags-text">{item.tags.join(", ")}</div>
+                    {item.notes ? (
+                      <div class="tags-overlay" title={item.notes}>
+                        <div class="tags-text">{item.notes}</div>
                       </div>
                     ) : null}
                   </div>

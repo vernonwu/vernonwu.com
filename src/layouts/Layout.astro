@@ -5,6 +5,7 @@ import "katex/dist/katex.min.css";
 import { ViewTransitions } from "astro:transitions";
 import BackToTop from "@components/BackToTop.astro";
 import Analytics from "@vercel/analytics/astro";
+import SpeedInsights from "@vercel/speed-insights/astro";
 
 const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
 
@@ -143,5 +144,6 @@ const structuredData = {
     <slot />
     <BackToTop />
     <Analytics />
+    <SpeedInsights />
   </body>
 </html>

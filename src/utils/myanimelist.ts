@@ -13,7 +13,7 @@ type MALItem = {
     score?: number;
     num_episodes_watched?: number;
     num_chapters_read?: number;
-    tags?: string[];
+    comments?: string;
     start_date?: string;
     finish_date?: string;
   };
@@ -39,7 +39,7 @@ export type CollectionItem = {
   kind: "anime" | "manga";
   mediaType?: string;
   typeCategory: "TV" | "Movie" | "Manga" | "Other";
-  tags?: string[];
+  notes?: string;
   startDate?: string;
   finishDate?: string;
 };
@@ -111,7 +111,7 @@ function mapItems(kind: "anime" | "manga", data?: MALItem[]): CollectionItem[] {
         kind,
         mediaType: node.media_type,
         typeCategory,
-        tags: list_status?.tags?.filter(Boolean),
+        notes: list_status?.comments?.trim() || undefined,
         startDate,
         finishDate,
       } satisfies CollectionItem;
@@ -132,8 +132,8 @@ export async function fetchMalList(
 
   const fields =
     kind === "anime"
-      ? "list_status{status,score,num_episodes_watched,tags,start_date,finish_date},media_type,alternative_titles{ja}"
-      : "list_status{status,score,num_chapters_read,tags,start_date,finish_date},media_type,alternative_titles{ja}";
+      ? "list_status{status,score,num_episodes_watched,comments,start_date,finish_date},media_type,alternative_titles{ja}"
+      : "list_status{status,score,num_chapters_read,comments,start_date,finish_date},media_type,alternative_titles{ja}";
 
   const params = new URLSearchParams({
     limit: limit.toString(),

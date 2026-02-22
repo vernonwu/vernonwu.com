@@ -214,9 +214,9 @@ export default function AnimeGrid({ items }: { items: CollectionItem[] }) {
                       <div className="title-overlay">
                         <div className="title-text">{item.title}</div>
                       </div>
-                      {item.tags?.length ? (
-                        <div className="tags-overlay" title={item.tags.join(", ")}>
-                          <div className="tags-text">{item.tags.join(", ")}</div>
+                      {item.notes ? (
+                        <div className="tags-overlay" title={item.notes}>
+                          <div className="tags-text">{item.notes}</div>
                         </div>
                       ) : null}
                     </div>

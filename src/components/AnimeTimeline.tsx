@@ -165,9 +165,7 @@ export default function AnimeTimeline({ items }: { items: CollectionItem[] }) {
                     delete cardRefs.current[key];
                   }
                 };
-                const comments =
-                  (entry.item as CollectionItem & { comments?: string }).comments ??
-                  (entry.item.tags?.length ? entry.item.tags.join(", ") : undefined);
+                const comments = entry.item.notes;
               const visible = visibleCards[key];
               const cardMotion =
                 side === "left"
