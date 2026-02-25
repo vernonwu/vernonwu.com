@@ -6,6 +6,8 @@ import getPostsByTag from "@utils/getPostsByTag";
 import type { GetStaticPathsOptions } from "astro";
 import { SITE } from "@config";
 
+export const prerender = true;
+
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   const posts = await getCollection("blog");
   const tags = getUniqueTags(posts);
