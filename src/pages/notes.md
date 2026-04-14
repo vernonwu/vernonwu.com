@@ -5,14 +5,14 @@ description: "A list of my public obsidian notes."
 ---
 
 - Machine Learning:
-  - [Machine Learning Basics](https://laplacian.net/tsr4l81s#BpbPPfvTXRmUhyK46hpt38HizjDI+BS1AChZhzCHb6I)
+  - [Machine Learning Basics](https://laplacian.net/oxzo6aun#4qS9tojDTajHYHPphzU7Vy43ejZpeK59gZlH5FQrPrw)
 
-  - [Stanford CS231n: Deep Learning for Computer Vision](https://laplacian.net/9hxpeh1v#7ucyZ1R/HA9iP28JUx2ULCm9V+cLpq2nOJpWjt7iAW8)
+  - [Stanford CS231n: Deep Learning for Computer Vision](https://laplacian.net/o0vqeglh#NDMzffMT+A0J8uIgJklvfPaKcP2u0+k0ruOSo48R5SQ)
 
-  - [Berkeley CS285: Deep Reinforcement Learning](https://laplacian.net/rp02782m#kggEv9bfn/B1pd78O6lAAdy5yezzf4LVuEbcwZahOMs)
+  - [Berkeley CS285: Deep Reinforcement Learning](https://laplacian.net/8l78xjyh#dOXGvpoAASWUqq9zOWxIo9VXDQAzlZjsSUTN9r1Sr3k)
 
 - Programming Languages:
-  - [Rust](https://laplacian.net/vl9hom91#UHVDf4B/xGptI1iTYy/fLa2BAga4YsQ9Ovvk7s1Arl0)
+  - [Rust](https://laplacian.net/moehgfri#sV/zIwnEK5X85rXpdoILEBFjid6Kv5ySGlVpaJP6tgs)
 
 - Miscellaneous:
-  - [Japanese Grammar](https://laplacian.net/eaaek84w#OSvwVdlKv2l82MvghJWYPrgD1FrTX30vo02ccHi+U8Q)
+  - [Japanese Grammar](https://laplacian.net/0ma5x29x#PgjC8IhdfwZgviCgJAH9eNwnGcMWNMm4pIXa9EMyMhc)
