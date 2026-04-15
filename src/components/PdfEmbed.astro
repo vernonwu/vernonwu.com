@@ -22,10 +22,10 @@ const {
 
 // Serve PDFs from CDN when a non-HTTP source is provided. This mirrors the
 // blog's approach of hosting PDFs on the `picx-images-hosting` repo via
-// `cdn.laplacian.net`. If the author passes an absolute URL (http/https),
+// `cdn.jsdelivr.net`. If the author passes an absolute URL (http/https),
 // we use it unchanged.
 const CDN_BASE =
-  "https://cdn.laplacian.net/gh/vernonwu/picx-images-hosting@master";
+  "https://cdn.jsdelivr.net/gh/vernonwu/picx-images-hosting@master";
 const cdnSrc = (() => {
   if (!src) return src;
   const trimmed = String(src).trim();
