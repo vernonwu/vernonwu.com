@@ -4,7 +4,7 @@ author: Vernon Wu
 pubDatetime: 2024-04-14T13:32:00Z
 slug: efficient-transformers
 featured: false
-draft: false
+draft: true
 ogImage: /assets/nozomi.jpg
 tags:
   - Computer Vision
