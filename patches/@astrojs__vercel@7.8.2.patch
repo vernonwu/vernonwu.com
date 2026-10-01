@@ -1,0 +1,11 @@
+diff --git a/dist/serverless/adapter.js b/dist/serverless/adapter.js
+--- a/dist/serverless/adapter.js
++++ b/dist/serverless/adapter.js
+@@ -36,6 +36,7 @@ const ISR_PATH = `/_isr?${ASTRO_PATH_PARAM}=$0`;
+ const SUPPORTED_NODE_VERSIONS = {
+     18: { status: 'retiring', removal: 'Early 2025', warnDate: new Date('October 1 2024') },
+     20: { status: 'default' },
++    24: { status: 'default' },
+ };
+ function getAdapter({ edgeMiddleware, functionPerRoute, middlewareSecret, skewProtection, }) {
+     return {
