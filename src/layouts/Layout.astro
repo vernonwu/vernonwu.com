@@ -3,7 +3,10 @@ import { LOCALE, SITE } from "@config";
 import "@styles/base.css";
 import "katex/dist/katex.min.css";
 import { ViewTransitions } from "astro:transitions";
+import type { TransitionAnimation } from "astro";
+import bodyFontUrl from "@assets/fonts/NewCM10-Book.woff2?url";
 import BackToTop from "@components/BackToTop.astro";
+import SearchDialog from "@components/SearchDialog.astro";
 import Analytics from "@vercel/analytics/astro";
 import SpeedInsights from "@vercel/speed-insights/astro";
 
@@ -33,6 +36,25 @@ const {
   scrollSmooth = false,
 } = Astro.props;
 
+// Quick fade out, then the new page fades in while rising slightly.
+// The header has its own transition (none), so it stays put.
+const pageOut: TransitionAnimation = {
+  name: "vtPageOut",
+  duration: "140ms",
+  easing: "ease-in",
+  fillMode: "both",
+};
+const pageIn: TransitionAnimation = {
+  name: "vtPageIn",
+  duration: "300ms",
+  easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+  fillMode: "both",
+};
+const pageTransition = {
+  forwards: { old: pageOut, new: pageIn },
+  backwards: { old: pageOut, new: pageIn },
+};
+
 const socialImageURL = new URL(
   ogImage ?? SITE.ogImage ?? "og.png",
   Astro.url.origin
@@ -59,10 +81,11 @@ const structuredData = {
 <html
   lang=`${LOCALE.lang ?? "en"}`
   class={`${scrollSmooth && "scroll-smooth"}`}
+  transition:animate={pageTransition}
 >
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
@@ -111,16 +134,14 @@ const structuredData = {
       set:html={JSON.stringify(structuredData)}
     />
 
-    <!-- Google Font -->
-    <!-- <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Body font: fetch the regular weight early so text doesn't reflow when it swaps in -->
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap"
       rel="preload"
-      as="style"
-      onload="this.onload=null; this.rel='stylesheet';"
+      href={bodyFontUrl}
+      as="font"
+      type="font/woff2"
       crossorigin
-    /> -->
+    />
 
     <meta name="theme-color" content="" />
 
@@ -138,11 +159,12 @@ const structuredData = {
 
     <ViewTransitions />
 
-    <script is:inline src="/toggle-theme.js" async></script>
+    <script is:inline src="/toggle-theme.js"></script>
   </head>
   <body>
     <slot />
     <BackToTop />
+    <SearchDialog />
     <Analytics />
     <SpeedInsights />
   </body>

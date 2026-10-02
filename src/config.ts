@@ -16,16 +16,15 @@ export const GISCUS: GiscusProps = {
 
 export const SITE: Site = {
   website: "https://vernonwu.com/", // replace this with your deployed domain
-  author: "Sat Naing",
+  author: "Vernon Wu",
   profile: "https://vernonwu.com",
   desc: "Sing of today.",
   title: "vernonwu",
   ogImage: "nozomi.jpg",
   lightAndDarkMode: true,
   postPerIndex: 4,
-  postPerPage: 3,
+  postPerPage: 10,
   scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
-  showArchives: true,
   editPost: {
     url: "https://github.com/vernonwu/vernonwu.com/tree/main/src/content/blog",
     text: "Suggest Changes",

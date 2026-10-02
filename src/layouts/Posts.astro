@@ -6,6 +6,8 @@ import Footer from "@components/Footer.astro";
 import Pagination from "@components/Pagination.astro";
 import Card from "@components/Card";
 import { SITE } from "@config";
+import getPostsByGroupCondition from "@utils/getPostsByGroupCondition";
+import getReadingTime from "@utils/getReadingTime";
 import type { Page } from "astro";
 import type { CollectionEntry } from "astro:content";
 
@@ -14,21 +16,53 @@ export interface Props {
 }
 
 const { page } = Astro.props;
+
+// Group by the same date the list is sorted by (updated, else published),
+// so each year's posts stay together and in order
+const postsByYear = Object.entries(
+  getPostsByGroupCondition(page.data, ({ data }) =>
+    new Date(data.modDatetime ?? data.pubDatetime).getFullYear()
+  )
+).sort(([yearA], [yearB]) => Number(yearB) - Number(yearA));
 ---
 
 <Layout title={`Posts | ${SITE.title}`}>
   <Header activeNav="posts" />
   <Main pageTitle="Posts" pageDesc="All the articles I've posted.">
-    <ul>
-      {
-        page.data.map(({ data, slug }) => (
-          <Card href={`/posts/${slug}/`} frontmatter={data} />
-        ))
-      }
-    </ul>
+    {
+      postsByYear.map(([year, posts]) => (
+        <div class="year-group">
+          <h2 class="year-heading">
+            {year}
+            <sup>{posts.length}</sup>
+          </h2>
+          <ul>
+            {posts.map(({ data, slug, body }) => (
+              <Card
+                href={`/posts/${slug}/`}
+                frontmatter={data}
+                readingTime={getReadingTime(body)}
+              />
+            ))}
+          </ul>
+        </div>
+      ))
+    }
   </Main>
 
   <Pagination {page} />
 
   <Footer noMarginTop={page.lastPage > 1} />
 </Layout>
+
+<style>
+  .year-group {
+    @apply mb-8;
+  }
+  .year-heading {
+    @apply text-2xl font-bold;
+  }
+  .year-heading sup {
+    @apply ml-1 text-sm font-normal opacity-70;
+  }
+</style>

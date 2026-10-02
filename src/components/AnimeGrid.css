@@ -61,9 +61,9 @@
 }
 
 .filter-pill.active {
-  background: linear-gradient(135deg, #6aa9ff, #4f8dff);
-  color: white;
-  box-shadow: 0 4px 12px rgba(79, 141, 255, 0.35);
+  background: rgb(var(--color-accent));
+  color: rgb(var(--color-fill));
+  box-shadow: 0 4px 12px rgba(var(--color-accent), 0.35);
 }
 
 .filter-pill:not(.active):hover {
@@ -88,6 +88,17 @@
   @apply overflow-hidden rounded-xl border border-skin-line bg-skin-card shadow-sm transition hover:-translate-y-1 hover:shadow-lg;
 }
 
+/* Each card has its own view-transition-name (set inline), so it can move
+   between grid slots when the filters or page change */
+.collection-card {
+  view-transition-class: collection-card;
+}
+
+::view-transition-group(*.collection-card) {
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .collection-card a {
   @apply block h-full;
 }
@@ -107,51 +118,58 @@
 
 .type-chip {
   @apply absolute left-3 top-3 flex items-center gap-2 rounded-full bg-skin-card-muted/90 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide;
-}
-
-.collection-card:hover .type-chip {
-  @apply opacity-0;
+  transition: opacity 150ms ease;
 }
 
 .score-chip {
   @apply absolute right-3 top-3 rounded-full bg-skin-card-muted/90 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide;
+  transition: opacity 150ms ease;
 }
 
-.collection-card:hover .score-chip {
+.collection-card:hover .type-chip,
+.collection-card:hover .score-chip,
+.collection-card:focus-within .type-chip,
+.collection-card:focus-within .score-chip {
   @apply opacity-0;
 }
 
-.title-overlay {
-  @apply absolute left-0 right-0 top-0 overflow-hidden;
+/* Overlays slide in from the card edges. height: 0 -> auto can't be animated,
+   so they stay full height and move with transform instead. */
+.title-overlay,
+.tags-overlay {
+  @apply absolute left-0 right-0;
   pointer-events: none;
-  height: 0;
-  transition: height 180ms ease, padding 180ms ease, background-color 180ms ease;
-  background: rgba(0, 0, 0, 0.75);
+  padding: 0.5rem 1rem 0.75rem;
   color: white;
+  opacity: 0;
+  transition:
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms ease;
 }
 
-.collection-card:hover .title-overlay {
-  height: auto;
-  padding: 0.5rem 1rem 0.75rem;
+.title-overlay {
+  @apply top-0;
+  background: rgba(0, 0, 0, 0.75);
+  transform: translateY(-100%);
+}
+
+.tags-overlay {
+  @apply bottom-0;
+  background: rgba(0, 0, 0, 0.7);
+  transform: translateY(100%);
+}
+
+.collection-card:hover .title-overlay,
+.collection-card:hover .tags-overlay,
+.collection-card:focus-within .title-overlay,
+.collection-card:focus-within .tags-overlay {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .title-text {
   @apply text-sm font-medium leading-snug;
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-}
-
-.tags-overlay {
-  @apply absolute left-0 right-0 bottom-0 overflow-hidden;
-  pointer-events: none;
-  height: 0;
-  transition: height 180ms ease, padding 180ms ease, background-color 180ms ease;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-}
-
-.collection-card:hover .tags-overlay {
-  height: auto;
-  padding: 0.5rem 1rem 0.75rem;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 .tags-text {
@@ -174,4 +192,26 @@
 
 .pager-meta {
   @apply text-sm text-skin-base/80;
+}
+
+/* Touch screens can't hover: keep the title visible along the bottom of the
+   poster (clear of the chips at the top) and skip the notes overlay */
+@media (hover: none) {
+  .title-overlay {
+    top: auto;
+    bottom: 0;
+    padding-top: 1.75rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+    opacity: 1;
+    transform: none;
+  }
+
+  .tags-overlay {
+    display: none;
+  }
+
+  .collection-card:focus-within .type-chip,
+  .collection-card:focus-within .score-chip {
+    opacity: 1;
+  }
 }

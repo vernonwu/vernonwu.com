@@ -17,6 +17,8 @@ module.exports = {
     screens: {
       sm: "640px",
       md: "768px",
+      lg: "1024px",
+      xl: "1280px",
     },
 
     extend: {
@@ -67,7 +69,14 @@ module.exports = {
           '"Noto Serif CJK SC"',
           'serif'
         ],
-        mono: ["IBM Plex Mono", "monospace"],
+        mono: [
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "Consolas",
+          '"Liberation Mono"',
+          "monospace",
+        ],
       },
 
       typography: {

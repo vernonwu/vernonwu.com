@@ -1,0 +1,141 @@
+---
+import { getCollection } from "astro:content";
+import SearchBar from "@components/Search";
+import getSortedPosts from "@utils/getSortedPosts";
+import getSearchList from "@utils/getSearchList";
+
+const posts = await getCollection("blog", ({ data }) => !data.draft);
+const searchList = getSearchList(getSortedPosts(posts));
+---
+
+<!--
+  ⌘K / Ctrl+K / "/" search pop-up, opened from anywhere on the site.
+  The island hydrates the first time the dialog becomes visible, so pages
+  that never open it don't download React or Fuse.
+-->
+<dialog id="search-dialog" class="search-dialog" aria-label="Search posts">
+  <div class="search-dialog__panel">
+    <SearchBar client:visible searchList={searchList} variant="dialog" />
+  </div>
+  <p class="search-dialog__hint">
+    <kbd>Esc</kbd> to close · <kbd>/</kbd> or <kbd>⌘K</kbd> to open
+  </p>
+</dialog>
+
+<style is:global>
+  .search-dialog {
+    @apply w-[min(40rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-skin-line bg-skin-fill p-0 text-skin-base shadow-2xl;
+    margin: 12vh auto auto;
+    max-height: min(76vh, 40rem);
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+    transition:
+      opacity 180ms ease,
+      transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+      overlay 260ms allow-discrete,
+      display 260ms allow-discrete;
+  }
+
+  .search-dialog[open] {
+    @apply flex flex-col;
+    opacity: 1;
+    transform: none;
+  }
+
+  @starting-style {
+    .search-dialog[open] {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.98);
+    }
+  }
+
+  .search-dialog::backdrop {
+    background: rgba(15, 18, 28, 0);
+    transition:
+      background-color 220ms ease,
+      overlay 260ms allow-discrete,
+      display 260ms allow-discrete;
+  }
+
+  .search-dialog[open]::backdrop {
+    background: rgba(15, 18, 28, 0.45);
+  }
+
+  @starting-style {
+    .search-dialog[open]::backdrop {
+      background: rgba(15, 18, 28, 0);
+    }
+  }
+
+  .search-dialog__panel {
+    @apply min-h-0 flex-1 overflow-y-auto p-4;
+    overscroll-behavior: contain;
+  }
+
+  .search-dialog__hint {
+    @apply border-t border-skin-line px-4 py-2 text-xs opacity-70;
+  }
+
+  .search-dialog kbd {
+    @apply rounded border border-skin-line bg-skin-card px-1 font-sans text-[0.7rem];
+  }
+</style>
+
+<script>
+  // Listeners live on document, so they keep working after view-transition
+  // navigations swap in a fresh dialog.
+  const getDialog = () =>
+    document.getElementById("search-dialog") as HTMLDialogElement | null;
+
+  const openSearch = () => {
+    const dialog = getDialog();
+    if (!dialog || dialog.open) return false;
+    dialog.showModal();
+    dialog.querySelector("input")?.select();
+    return true;
+  };
+
+  const isTyping = (target: EventTarget | null) =>
+    target instanceof HTMLElement &&
+    (target.isContentEditable ||
+      ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
+
+  document.addEventListener("keydown", event => {
+    const isModK =
+      (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
+    const isSlash =
+      event.key === "/" &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      !event.altKey &&
+      !isTyping(event.target);
+    if ((isModK || isSlash) && openSearch()) {
+      event.preventDefault();
+    }
+  });
+
+  document.addEventListener("click", event => {
+    const target = event.target as Element | null;
+    const dialog = getDialog();
+
+    // The header search button opens the pop-up instead of the /search page,
+    // unless the visitor is opening it in a new tab
+    const trigger = target?.closest("[data-search-trigger]");
+    const plainClick =
+      event.button === 0 &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      !event.shiftKey &&
+      !event.altKey;
+    if (trigger && plainClick && openSearch()) {
+      event.preventDefault();
+      return;
+    }
+
+    if (!dialog?.open) return;
+    // A click on the backdrop lands on the dialog element itself
+    if (target === dialog || target?.closest("#search-dialog a")) {
+      dialog.close();
+    }
+  });
+</script>

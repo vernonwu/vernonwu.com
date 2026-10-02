@@ -66,144 +66,117 @@ const nextPost =
 <Layout {...layoutProps}>
   <Header />
 
-  <main
-    id="main-content"
-    class="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pb-12 sm:flex-row sm:items-start sm:gap-10"
-  >
-    <div class="toc-spacer hidden w-[16rem] shrink-0 sm:block">
-      <aside
-        class="toc-wrapper fixed top-[15%] w-[16rem]"
-      >
-        <TableOfContents headings={headings} />
-      </aside>
-    </div>
+  <div class="progress-container" aria-hidden="true">
+    <div id="myBar" class="progress-bar"></div>
+  </div>
 
-    <div class="min-w-0 flex-1">
-      <div class="mx-auto w-full max-w-3xl">
-        <div class="mb-2 mt-8 flex justify-start">
-          <button
-            class="focus-outline flex hover:opacity-75"
-            onclick="(() => (history.length === 1) ? window.location = '/' : history.back())()"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg"
-              ><path
-                d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
-              ></path>
-            </svg><span>Go back</span>
-          </button>
-        </div>
+  <main id="main-content" class="post-layout">
+    <aside class="post-toc hidden xl:block">
+      <TableOfContents headings={headings} />
+    </aside>
 
-        <h1
-          transition:name={slugifyStr(title)}
-          class="post-title reveal-on-scroll"
-          data-reveal-target
+    <div class="post-body">
+      <div class="mb-2 mt-8 flex justify-start">
+        <button
+          class="focus-outline flex hover:opacity-75"
+          onclick="(() => (history.length === 1) ? window.location = '/' : history.back())()"
         >
-          {title}
-        </h1>
-        <Datetime
-          pubDatetime={pubDatetime}
-          modDatetime={modDatetime}
-          size="lg"
-          className="my-2"
-          editPost={editPost}
-          postId={post.id}
-        />
-        <article id="article" class="prose mx-auto mt-8 max-w-3xl">
-          <Content />
-        </article>
-
-        <ul class="my-8">
-          {tags.map(tag => <Tag tag={slugifyStr(tag)} />)}
-        </ul>
-
-        <div
-          class="flex flex-col-reverse items-center justify-between gap-6 sm:flex-row-reverse sm:items-end sm:gap-4"
-        >
-          <button
-            id="back-to-top"
-            class="focus-outline whitespace-nowrap py-1 hover:opacity-75"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="rotate-90">
-              <path
-                d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
-              ></path>
-            </svg>
-            <span>Back to Top</span>
-          </button>
-
-          <ShareLinks />
-        </div>
-
-        <div class="reveal-on-scroll" data-reveal-target>
-          <Comments client:only="react" />
-        </div>
-
-        <hr class="my-6 border-dashed" />
-
-        <!-- Previous/Next Post Buttons -->
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {
-            prevPost && (
-              <a
-                href={`/posts/${prevPost.slug}`}
-                class="flex w-full gap-1 hover:opacity-75"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left flex-none"
-                >
-                  <>
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M15 6l-6 6l6 6" />
-                  </>
-                </svg>
-                <div>
-                  <span>Previous Post</span>
-                  <div class="text-sm text-skin-accent/85">{prevPost.title}</div>
-                </div>
-              </a>
-            )
-          }
-          {
-            nextPost && (
-              <a
-                href={`/posts/${nextPost.slug}`}
-                class="flex w-full justify-end gap-1 text-right hover:opacity-75 sm:col-start-2"
-              >
-                <div>
-                  <span>Next Post</span>
-                  <div class="text-sm text-skin-accent/85">{nextPost.title}</div>
-                </div>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right flex-none"
-                >
-                  <>
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M9 6l6 6l-6 6" />
-                  </>
-                </svg>
-              </a>
-            )
-          }
-        </div>
+          <svg xmlns="http://www.w3.org/2000/svg"
+            ><path
+              d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
+            ></path>
+          </svg><span>Go back</span>
+        </button>
       </div>
+
+      <h1 transition:name={slugifyStr(title)} class="post-title">
+        {title}
+      </h1>
+      <Datetime
+        pubDatetime={pubDatetime}
+        modDatetime={modDatetime}
+        size="lg"
+        className="my-2"
+        editPost={editPost}
+        postId={post.id}
+      />
+
+      <TableOfContents headings={headings} variant="inline" class="mt-6 xl:hidden" />
+
+      <article id="article" class="prose prose-lg mt-8 max-w-none">
+        <Content />
+      </article>
+
+      <ul class="my-8">
+        {tags.map(tag => <Tag tag={slugifyStr(tag)} />)}
+      </ul>
+
+      <ShareLinks />
+
+      <hr class="my-8 border-dashed border-skin-line" />
+
+      <!-- Previous/Next Post Buttons -->
+      <nav class="post-nav" aria-label="Post navigation">
+        {
+          prevPost && (
+            <a href={`/posts/${prevPost.slug}`} class="post-nav-link">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left flex-none"
+              >
+                <>
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M15 6l-6 6l6 6" />
+                </>
+              </svg>
+              <div>
+                <span class="post-nav-label">Previous Post</span>
+                <div class="post-nav-title">{prevPost.title}</div>
+              </div>
+            </a>
+          )
+        }
+        {
+          nextPost && (
+            <a
+              href={`/posts/${nextPost.slug}`}
+              class="post-nav-link justify-end text-right sm:col-start-2"
+            >
+              <div>
+                <span class="post-nav-label">Next Post</span>
+                <div class="post-nav-title">{nextPost.title}</div>
+              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right flex-none"
+              >
+                <>
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M9 6l6 6l-6 6" />
+                </>
+              </svg>
+            </a>
+          )
+        }
+      </nav>
+
+      <Comments client:only="react" />
     </div>
   </main>
   <div
@@ -214,28 +187,114 @@ const nextPost =
     aria-modal="true"
     aria-label="Image viewer"
   >
-    <div class="image-viewer__content" role="document">
-      <figure class="image-viewer__figure">
-        <img id="image-viewer-img" class="image-viewer__image" alt="" loading="lazy" />
-      </figure>
-    </div>
+    <button type="button" class="image-viewer__close" aria-label="Close image viewer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M18 6 6 18M6 6l12 12" />
+      </svg>
+    </button>
+    <img id="image-viewer-img" class="image-viewer__image" alt="" draggable="false" />
   </div>
   <Footer />
 </Layout>
 
 <style>
+  /* Three columns: the article sits in the centre, aligned with the header and
+     footer (max-w-3xl minus padding); the ToC lives in the left gutter on wide screens */
+  .post-layout {
+    @apply w-full pb-12;
+    display: grid;
+    grid-template-columns: minmax(1rem, 1fr) minmax(0, 46rem) minmax(1rem, 1fr);
+  }
+
+  .post-body {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .post-toc {
+    --toc-top: 2.5rem;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: end;
+    align-self: start;
+    position: sticky;
+    top: var(--toc-top);
+    width: min(15rem, 100% - 2rem);
+    margin-top: 2rem;
+    margin-right: 2rem;
+    max-height: calc(100svh - var(--toc-top) - 2.5rem);
+    transition:
+      top 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      max-height 300ms cubic-bezier(0.22, 1, 0.36, 1);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  /* Move down out of the way while the sticky header is showing */
+  :global(html.header-pinned) .post-toc {
+    --toc-top: calc(var(--header-height, 0px) + 1rem);
+  }
+
   .post-title {
-    @apply text-2xl font-semibold text-skin-accent;
+    @apply text-3xl font-semibold leading-tight text-skin-accent sm:text-4xl;
+  }
+
+  .progress-container {
+    @apply pointer-events-none fixed left-0 top-0 z-40 h-1 w-full;
+  }
+
+  .progress-bar {
+    @apply h-full w-full origin-left bg-skin-accent;
+    transform: scaleX(0);
+    will-change: transform;
+  }
+
+  .post-nav {
+    @apply mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2;
+  }
+
+  .post-nav-link {
+    @apply flex w-full items-center gap-2 rounded-lg border border-skin-line px-4 py-3;
+    transition:
+      border-color 200ms ease,
+      transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .post-nav-link:hover {
+    @apply -translate-y-0.5 border-skin-accent;
+  }
+
+  .post-nav-label {
+    @apply text-sm opacity-80;
+  }
+
+  .post-nav-title {
+    @apply text-skin-accent;
   }
 
   .image-viewer {
     position: fixed;
     inset: 0;
     z-index: 60;
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1.5rem;
+    /* All touches go to the pan/pinch handlers instead of scrolling the page */
+    touch-action: none;
+    overscroll-behavior: contain;
+  }
+
+  .image-viewer[hidden] {
+    display: none;
+  }
+
+  /* Backdrop is its own layer so it can fade while the image flies in */
+  .image-viewer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
     background: radial-gradient(
         circle at 20% 20%,
         rgba(var(--color-fill), 0.9),
@@ -243,44 +302,58 @@ const nextPost =
       ),
       linear-gradient(135deg, rgba(var(--color-accent), 0.12), transparent 60%);
     backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 300ms ease;
   }
 
-  .image-viewer.open {
-    display: flex;
+  .image-viewer.is-visible::before {
+    opacity: 1;
   }
 
-  :global(body.image-viewer-open) {
+  :global(html.image-viewer-open) {
     overflow: hidden;
   }
 
-  .image-viewer__content {
-    position: relative;
-    width: min(1100px, 96vw);
-    max-height: 90vh;
-    display: grid;
-    gap: 0.75rem;
-    justify-items: center;
-  }
-
-  .image-viewer__figure {
-    margin: 0;
-    display: grid;
-    gap: 0.75rem;
-    width: 100%;
-  }
-
   .image-viewer__image {
-    width: 100%;
-    max-height: 78vh;
-    object-fit: contain;
+    position: relative;
+    max-width: none;
     border-radius: 0.5rem;
-    background: transparent;
-    border: none;
-    box-shadow: none;
+    /* match the article images, so transparent diagrams stay readable */
+    background-color: white;
     transform-origin: center center;
-    transition: transform 120ms ease;
+    transition: transform 140ms ease;
     user-select: none;
-    touch-action: none;
+    cursor: zoom-in;
+  }
+
+  .image-viewer__image.is-zoomed {
+    cursor: grab;
+  }
+
+  /* Follow fingers and the pointer 1:1 while gesturing; easing makes the image trail */
+  .image-viewer__image.is-gesturing {
+    cursor: grabbing;
+    transition: none;
+  }
+
+  .image-viewer__close {
+    @apply absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-skin-line bg-skin-card text-skin-base shadow-lg hover:bg-skin-card-muted;
+    opacity: 0;
+    transition:
+      opacity 200ms ease,
+      background-color 150ms ease;
+  }
+
+  .image-viewer.is-visible .image-viewer__close {
+    opacity: 1;
+  }
+
+  .image-viewer__close svg {
+    @apply h-5 w-5;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
   }
 
   #article img.zoomable-image {
@@ -348,545 +421,669 @@ const nextPost =
     opacity: 0;
   }
 
-  @media (max-width: 640px) {
-    .reveal-on-scroll {
-      opacity: 0;
-      transform: translateY(12px);
-      transition: opacity 220ms ease, transform 220ms ease;
+  /* Touch screens can't hover, so show the copy button with the language beside it */
+  @media (hover: none) {
+    :global(.copy-code) {
+      opacity: 1;
+      visibility: visible;
     }
 
-    .reveal-on-scroll.revealed {
+    :global(.code-language),
+    :global(.code-block-wrapper:focus-within .code-language) {
+      right: 3.25rem;
       opacity: 1;
-      transform: translateY(0);
     }
   }
+
 </style>
 
+<!--
+  Re-runs on every navigation to a post (data-astro-rerun). Everything is scoped
+  inside an IIFE so a second run can't collide with the first, and every listener
+  is torn down on astro:before-swap so nothing accumulates across navigations.
+-->
 <script is:inline data-astro-rerun>
-  /** Create a progress indicator
-   *  at the top */
-  function createProgressBar() {
-    // Create the main container div
-    const progressContainer = document.createElement("div");
-    progressContainer.className =
-      "progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill";
+  (() => {
+    /** Update the progress indicator at the top as the reader scrolls */
+    function initProgressBar() {
+      const bar = document.getElementById("myBar");
+      if (!bar) return;
 
-    // Create the progress bar div
-    const progressBar = document.createElement("div");
-    progressBar.className = "progress-bar h-1 w-0 bg-skin-accent";
-    progressBar.id = "myBar";
+      let ticking = false;
+      const update = () => {
+        ticking = false;
+        const root = document.documentElement;
+        const max = root.scrollHeight - root.clientHeight;
+        const progress = max > 0 ? Math.min(1, window.scrollY / max) : 0;
+        bar.style.transform = `scaleX(${progress})`;
+      };
+      const schedule = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(update);
+      };
 
-    // Append the progress bar to the progress container
-    progressContainer.appendChild(progressBar);
+      document.addEventListener("scroll", schedule, { passive: true });
+      window.addEventListener("resize", schedule, { passive: true });
+      update();
 
-    // Append the progress container to the document body or any other desired parent element
-    document.body.appendChild(progressContainer);
-  }
-  createProgressBar();
-
-  // Position ToC relative to its spacer so it stays centered and aligned
-  function positionToc() {
-    const toc = document.querySelector(".toc-wrapper");
-    const spacer = document.querySelector(".toc-spacer");
-    if (!toc || !spacer) return;
-
-    const rect = spacer.getBoundingClientRect();
-    toc.style.left = `${rect.left}px`;
-  }
-  const schedulePositionToc = () => requestAnimationFrame(positionToc);
-  schedulePositionToc();
-  window.addEventListener("resize", schedulePositionToc, { passive: true });
-
-  // Highlight current section and subsection in the ToC
-  let cleanupTocHighlight;
-  let cleanupRevealOnScroll;
-  let cleanupImageViewer;
-  function initTocHighlight() {
-    const articleHeadings = Array.from(
-      document.querySelectorAll("#article h2, #article h3, #article h4")
-    );
-    const tocLinks = new Map(
-      Array.from(
-        document.querySelectorAll(".toc-link[data-toc-slug]"),
-        link => [link.getAttribute("data-toc-slug"), link]
-      )
-    );
-    const tocItems = new Map(
-      Array.from(
-        document.querySelectorAll("[data-toc-item]"),
-        item => [item.getAttribute("data-toc-item"), item]
-      )
-    );
-
-    if (!articleHeadings.length || tocLinks.size === 0 || tocItems.size === 0) return;
-
-    const parentOf = new Map();
-    let lastH2 = null;
-    let lastH3 = null;
-    for (const heading of articleHeadings) {
-      if (heading.tagName === "H2") {
-        lastH2 = heading.id;
-        lastH3 = null;
-        parentOf.set(heading.id, null);
-      } else if (heading.tagName === "H3") {
-        parentOf.set(heading.id, lastH2);
-        lastH3 = heading.id;
-      } else if (heading.tagName === "H4") {
-        parentOf.set(heading.id, lastH3 ?? lastH2);
-      }
+      return () => {
+        document.removeEventListener("scroll", schedule);
+        window.removeEventListener("resize", schedule);
+      };
     }
 
-    const clearActive = () =>
-      tocLinks.forEach(link => link.classList.remove("active"));
+    /** Highlight the current section and subsection in the sidebar ToC */
+    function initTocHighlight() {
+      const toc = document.querySelector("[data-toc-root='sidebar']");
+      const articleHeadings = Array.from(
+        document.querySelectorAll("#article h2, #article h3, #article h4")
+      ).filter(heading => heading.id);
+      if (!toc || !articleHeadings.length) return;
 
-    const clearOpen = () => tocItems.forEach(item => item.classList.remove("open"));
-
-    const markActiveChain = slug => {
-      const visited = new Set();
-      let current = slug;
-      while (current && !visited.has(current)) {
-        visited.add(current);
-        tocLinks.get(current)?.classList.add("active");
-        current = parentOf.get(current) ?? null;
-      }
-    };
-
-    const markOpenChain = slug => {
-      const visited = new Set();
-      let current = slug;
-      while (current && !visited.has(current)) {
-        visited.add(current);
-        tocItems.get(current)?.classList.add("open");
-        current = parentOf.get(current) ?? null;
-      }
-    };
-
-    const getCurrentSlug = () => {
-      const threshold = window.scrollY + window.innerHeight * 0.25;
-      let current = articleHeadings[0]?.id ?? null;
-      for (const heading of articleHeadings) {
-        if (heading.offsetTop <= threshold) {
-          current = heading.id;
-        } else {
-          break;
-        }
-      }
-      return current;
-    };
-
-    let activeSlug = null;
-    const updateActive = () => {
-      const slug = getCurrentSlug();
-      if (!slug || slug === activeSlug) return;
-      activeSlug = slug;
-      clearActive();
-      clearOpen();
-      markActiveChain(slug);
-      markOpenChain(slug);
-    };
-
-    const onScroll = () => requestAnimationFrame(updateActive);
-    const onResize = () => requestAnimationFrame(updateActive);
-
-    document.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onResize, { passive: true });
-    updateActive();
-
-    return () => {
-      document.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onResize);
-    };
-  }
-  cleanupTocHighlight = initTocHighlight();
-
-  // Reveal selected blocks on scroll for mobile screens
-  function initRevealOnScroll() {
-    const targets = Array.from(document.querySelectorAll("[data-reveal-target]"));
-    if (!targets.length) return;
-
-    const mediaQuery = window.matchMedia("(max-width: 640px)");
-    let observer = null;
-
-    const disconnect = () => observer?.disconnect();
-
-    const showAll = () => {
-      targets.forEach(el => el.classList.add("revealed"));
-    };
-
-    const setupObserver = () => {
-      disconnect();
-      if (!mediaQuery.matches) {
-        showAll();
-        return;
-      }
-
-      observer = new IntersectionObserver(
-        entries => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("revealed");
-              observer?.unobserve(entry.target);
-            }
-          });
-        },
-        { threshold: 0.15 }
+      const tocLinks = new Map(
+        Array.from(toc.querySelectorAll(".toc-link[data-toc-slug]"), link => [
+          link.getAttribute("data-toc-slug"),
+          link,
+        ])
       );
+      const tocItems = new Map(
+        Array.from(toc.querySelectorAll("[data-toc-item]"), item => [
+          item.getAttribute("data-toc-item"),
+          item,
+        ])
+      );
+      if (tocLinks.size === 0) return;
 
-      targets.forEach(el => {
-        // Remove stale visibility when switching breakpoints
-        el.classList.remove("revealed");
-        observer?.observe(el);
-      });
-    };
-
-    setupObserver();
-    mediaQuery.addEventListener("change", setupObserver);
-
-    return () => {
-      disconnect();
-      mediaQuery.removeEventListener("change", setupObserver);
-    };
-  }
-  cleanupRevealOnScroll = initRevealOnScroll();
-
-  // Full-screen image viewer for blog images
-  function initImageViewer() {
-    const viewer = document.getElementById("image-viewer");
-    const viewerImg = document.getElementById("image-viewer-img");
-    if (!viewer || !viewerImg) return;
-    viewerImg.setAttribute("draggable", "false");
-
-    const articleImages = Array.from(document.querySelectorAll("#article img"));
-    if (!articleImages.length) return;
-
-    const listeners = new Map();
-    let activeImage = null;
-    let scale = 1;
-    let translateX = 0;
-    let translateY = 0;
-    let isDragging = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
-    let dragOriginX = 0;
-    let dragOriginY = 0;
-
-    const applyScale = () => {
-      viewerImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-      const pannable = scale !== 1 || translateX !== 0 || translateY !== 0;
-      viewerImg.style.cursor = pannable ? (isDragging ? "grabbing" : "grab") : "auto";
-    };
-
-    const open = img => {
-      const src = img.getAttribute("src");
-      if (!src) return;
-      activeImage = img;
-      viewerImg.src = src;
-      viewerImg.alt = img.getAttribute("alt") ?? "";
-      scale = 1;
-      translateX = 0;
-      translateY = 0;
-      applyScale();
-      viewer.classList.add("open");
-      viewer.removeAttribute("hidden");
-      document.body.classList.add("image-viewer-open");
-      viewer.tabIndex = -1;
-      viewer.focus({ preventScroll: true });
-    };
-
-    const close = () => {
-      viewer.classList.remove("open");
-      viewer.setAttribute("hidden", "true");
-      viewerImg.src = "";
-      scale = 1;
-      translateX = 0;
-      translateY = 0;
-      applyScale();
-      document.body.classList.remove("image-viewer-open");
-
-      if (activeImage?.isConnected) {
-        activeImage.focus({ preventScroll: true });
+      const parentOf = new Map();
+      let lastH2 = null;
+      let lastH3 = null;
+      for (const heading of articleHeadings) {
+        if (heading.tagName === "H2") {
+          lastH2 = heading.id;
+          lastH3 = null;
+          parentOf.set(heading.id, null);
+        } else if (heading.tagName === "H3") {
+          parentOf.set(heading.id, lastH2);
+          lastH3 = heading.id;
+        } else if (heading.tagName === "H4") {
+          parentOf.set(heading.id, lastH3 ?? lastH2);
+        }
       }
-      activeImage = null;
-    };
 
-    const onBackdropClick = event => {
-      if (event.target === viewer) {
-        close();
-      }
-    };
-
-    const onEsc = event => {
-      if (event.key === "Escape" && viewer.classList.contains("open")) {
-        close();
-      }
-    };
-
-    const onWheel = event => {
-      if (!viewer.classList.contains("open")) return;
-      event.preventDefault();
-      const delta = event.deltaY;
-      const direction = delta > 0 ? -1 : 1;
-      const next = Math.min(4, Math.max(0.75, scale + direction * 0.2));
-      if (next === scale) return;
-      scale = next;
-      applyScale();
-    };
-
-    const onDragStart = event => {
-      event.preventDefault();
-    };
-
-    const onPointerDown = event => {
-      if (!viewer.classList.contains("open")) return;
-      if (event.button !== 0) return;
-      isDragging = true;
-      dragStartX = event.clientX;
-      dragStartY = event.clientY;
-      dragOriginX = translateX;
-      dragOriginY = translateY;
-      viewerImg.setPointerCapture(event.pointerId);
-      applyScale();
-    };
-
-    const onPointerMove = event => {
-      if (!isDragging) return;
-      event.preventDefault();
-      const deltaX = event.clientX - dragStartX;
-      const deltaY = event.clientY - dragStartY;
-      translateX = dragOriginX + deltaX;
-      translateY = dragOriginY + deltaY;
-      applyScale();
-    };
-
-    const endDrag = event => {
-      if (!isDragging) return;
-      isDragging = false;
-      if (event?.pointerId != null) {
-        viewerImg.releasePointerCapture(event.pointerId);
-      }
-      applyScale();
-    };
-
-    articleImages.forEach(img => {
-      const onClick = event => {
-        event?.preventDefault();
-        event?.stopPropagation();
-        open(img);
+      const chainOf = slug => {
+        const chain = [];
+        const visited = new Set();
+        let current = slug;
+        while (current && !visited.has(current)) {
+          visited.add(current);
+          chain.push(current);
+          current = parentOf.get(current) ?? null;
+        }
+        return chain;
       };
+
+      const getCurrentSlug = () => {
+        const threshold = window.innerHeight * 0.25;
+        let current = articleHeadings[0].id;
+        for (const heading of articleHeadings) {
+          if (heading.getBoundingClientRect().top <= threshold) {
+            current = heading.id;
+          } else {
+            break;
+          }
+        }
+        return current;
+      };
+
+      let activeSlug = null;
+      let ticking = false;
+      const update = () => {
+        ticking = false;
+        const slug = getCurrentSlug();
+        if (slug === activeSlug) return;
+        activeSlug = slug;
+
+        tocLinks.forEach(link => {
+          link.classList.remove("active");
+          link.removeAttribute("aria-current");
+        });
+        tocItems.forEach(item => item.classList.remove("open"));
+
+        chainOf(slug).forEach(id => {
+          tocLinks.get(id)?.classList.add("active");
+          tocItems.get(id)?.classList.add("open");
+        });
+        tocLinks.get(slug)?.setAttribute("aria-current", "location");
+      };
+      const schedule = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(update);
+      };
+
+      document.addEventListener("scroll", schedule, { passive: true });
+      window.addEventListener("resize", schedule, { passive: true });
+      update();
+
+      return () => {
+        document.removeEventListener("scroll", schedule);
+        window.removeEventListener("resize", schedule);
+      };
+    }
+
+    /** Full-screen image viewer for blog images. Opens by flying the image
+     *  out of the article and closes by flying it back. Supports wheel, pinch
+     *  and double-tap zoom, and drag to pan once zoomed. */
+    function initImageViewer() {
+      const viewer = document.getElementById("image-viewer");
+      const viewerImg = document.getElementById("image-viewer-img");
+      const closeBtn = viewer?.querySelector(".image-viewer__close");
+      if (!viewer || !viewerImg || !closeBtn) return;
+
+      const articleImages = Array.from(document.querySelectorAll("#article img"));
+      if (!articleImages.length) return;
+
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+      const MAX_SCALE = 5;
+
+      const listeners = new Map();
+      const pointers = new Map();
+      let activeImage = null;
+      let isOpen = false;
+      let closeAnimation = null;
+      let scale = 1;
+      let translateX = 0;
+      let translateY = 0;
+      let gesture = null;
+      let tap = null;
+      let lastTap = { time: 0, x: 0, y: 0 };
+
+      const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+      const viewerCenter = () => {
+        const box = viewer.getBoundingClientRect();
+        return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
+      };
+
+      const render = () => {
+        viewerImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        viewerImg.classList.toggle("is-zoomed", scale > 1);
+      };
+
+      const resetZoom = () => {
+        scale = 1;
+        translateX = 0;
+        translateY = 0;
+        render();
+      };
+
+      /** Zoom to `next`, keeping the image point under (x, y) where it is */
+      const zoomAt = (next, x, y) => {
+        next = clamp(next, 1, MAX_SCALE);
+        if (next === 1) {
+          resetZoom();
+          return;
+        }
+        const center = viewerCenter();
+        const dx = x - center.x;
+        const dy = y - center.y;
+        const ratio = next / scale;
+        translateX = dx - ratio * (dx - translateX);
+        translateY = dy - ratio * (dy - translateY);
+        scale = next;
+        render();
+      };
+
+      /** Size the viewer image to fit the screen (small images are scaled up) */
+      const fitToViewport = img => {
+        const box = viewer.getBoundingClientRect();
+        const naturalWidth = img.naturalWidth || img.width || 1;
+        const naturalHeight = img.naturalHeight || img.height || 1;
+        const maxWidth = Math.min(1100, box.width * 0.96);
+        const maxHeight = box.height * 0.84;
+        const fit = Math.min(maxWidth / naturalWidth, maxHeight / naturalHeight);
+        viewerImg.style.width = `${naturalWidth * fit}px`;
+        viewerImg.style.height = `${naturalHeight * fit}px`;
+      };
+
+      /** Transform that lays the (centred) viewer image exactly over `rect` */
+      const transformOver = rect => {
+        const center = viewerCenter();
+        const x = rect.left + rect.width / 2 - center.x;
+        const y = rect.top + rect.height / 2 - center.y;
+        const s = rect.width / viewerImg.offsetWidth;
+        return `translate(${x}px, ${y}px) scale(${s})`;
+      };
+
+      const open = async img => {
+        const src = img.currentSrc || img.getAttribute("src");
+        if (!src || isOpen) return;
+        isOpen = true;
+        activeImage = img;
+        const thumbRect = img.getBoundingClientRect();
+
+        viewerImg.src = src;
+        viewerImg.alt = img.getAttribute("alt") ?? "";
+        // Wait until it can paint, or it flies in as an empty box
+        await viewerImg.decode().catch(() => {});
+        if (activeImage !== img) return;
+
+        document.documentElement.classList.add("image-viewer-open");
+        viewer.removeAttribute("hidden");
+        fitToViewport(img);
+        resetZoom();
+        // Commit the hidden state before fading in, or the backdrop won't transition
+        void viewer.offsetWidth;
+        viewer.classList.add("is-visible");
+        img.style.visibility = "hidden";
+        closeBtn.focus({ preventScroll: true });
+
+        if (!reduceMotion.matches) {
+          viewerImg.animate(
+            [{ transform: transformOver(thumbRect) }, { transform: viewerImg.style.transform }],
+            { duration: 380, easing: EASE }
+          );
+        }
+      };
+
+      const close = ({ immediate = false } = {}) => {
+        if (!isOpen) return;
+        isOpen = false;
+        pointers.clear();
+        gesture = null;
+        tap = null;
+        viewerImg.classList.remove("is-gesturing");
+        viewer.classList.remove("is-visible");
+        const img = activeImage;
+        activeImage = null;
+
+        const finish = () => {
+          closeAnimation = null;
+          viewer.setAttribute("hidden", "");
+          viewerImg.removeAttribute("src");
+          resetZoom();
+          document.documentElement.classList.remove("image-viewer-open");
+          if (img) img.style.visibility = "";
+          if (img?.isConnected && !immediate) img.focus({ preventScroll: true });
+        };
+
+        if (immediate || reduceMotion.matches || !img?.isConnected) {
+          closeAnimation?.cancel();
+          finish();
+          return;
+        }
+
+        closeAnimation = viewerImg.animate(
+          [
+            { transform: viewerImg.style.transform },
+            { transform: transformOver(img.getBoundingClientRect()) },
+          ],
+          { duration: 300, easing: EASE, fill: "forwards" }
+        );
+        const animation = closeAnimation;
+        animation.finished
+          .catch(() => {})
+          .then(() => {
+            animation.cancel();
+            finish();
+          });
+      };
+
+      const startPan = (x, y) => {
+        gesture = { type: "pan", x, y, translateX, translateY };
+      };
+
+      const startPinch = () => {
+        const [a, b] = Array.from(pointers.values());
+        gesture = {
+          type: "pinch",
+          distance: Math.hypot(b.x - a.x, b.y - a.y) || 1,
+          midX: (a.x + b.x) / 2,
+          midY: (a.y + b.y) / 2,
+          scale,
+          translateX,
+          translateY,
+        };
+        viewerImg.classList.add("is-gesturing");
+      };
+
+      const onPointerDown = event => {
+        if (!isOpen || event.target.closest(".image-viewer__close")) return;
+        if (event.pointerType === "mouse" && event.button !== 0) return;
+        viewer.setPointerCapture(event.pointerId);
+        pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+        if (pointers.size === 1) {
+          tap = {
+            id: event.pointerId,
+            x: event.clientX,
+            y: event.clientY,
+            onImage: event.target === viewerImg,
+            moved: false,
+          };
+          startPan(event.clientX, event.clientY);
+        } else if (pointers.size === 2) {
+          tap = null;
+          startPinch();
+        }
+      };
+
+      const onPointerMove = event => {
+        if (!pointers.has(event.pointerId)) return;
+        pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        if (
+          tap?.id === event.pointerId &&
+          Math.hypot(event.clientX - tap.x, event.clientY - tap.y) > 8
+        ) {
+          tap.moved = true;
+        }
+
+        if (gesture?.type === "pinch" && pointers.size >= 2) {
+          const [a, b] = Array.from(pointers.values());
+          const distance = Math.hypot(b.x - a.x, b.y - a.y);
+          const midX = (a.x + b.x) / 2;
+          const midY = (a.y + b.y) / 2;
+          const next = clamp((gesture.scale * distance) / gesture.distance, 1, MAX_SCALE);
+          // Keep the image point that started under the fingers' midpoint under it
+          const center = viewerCenter();
+          const ratio = next / gesture.scale;
+          translateX = midX - center.x - ratio * (gesture.midX - center.x - gesture.translateX);
+          translateY = midY - center.y - ratio * (gesture.midY - center.y - gesture.translateY);
+          scale = next;
+          render();
+        } else if (gesture?.type === "pan" && scale > 1) {
+          viewerImg.classList.add("is-gesturing");
+          translateX = gesture.translateX + event.clientX - gesture.x;
+          translateY = gesture.translateY + event.clientY - gesture.y;
+          render();
+        }
+      };
+
+      const toggleZoomAt = (x, y) => {
+        if (scale > 1) {
+          resetZoom();
+        } else {
+          zoomAt(2.5, x, y);
+        }
+      };
+
+      /** Tap outside the image closes; on the image, a click (mouse) or
+       *  double-tap (touch) toggles zoom */
+      const onTap = event => {
+        if (!tap.onImage) {
+          close();
+          return;
+        }
+        if (event.pointerType === "mouse") {
+          toggleZoomAt(event.clientX, event.clientY);
+          return;
+        }
+        const isDoubleTap =
+          event.timeStamp - lastTap.time < 320 &&
+          Math.hypot(event.clientX - lastTap.x, event.clientY - lastTap.y) < 30;
+        if (isDoubleTap) {
+          lastTap.time = 0;
+          toggleZoomAt(event.clientX, event.clientY);
+        } else {
+          lastTap = { time: event.timeStamp, x: event.clientX, y: event.clientY };
+        }
+      };
+
+      const onPointerUp = event => {
+        if (!pointers.has(event.pointerId)) return;
+        pointers.delete(event.pointerId);
+
+        if (
+          event.type === "pointerup" &&
+          tap?.id === event.pointerId &&
+          !tap.moved &&
+          pointers.size === 0
+        ) {
+          onTap(event);
+        }
+        if (tap?.id === event.pointerId) tap = null;
+
+        if (pointers.size === 1) {
+          // One finger lifted out of a pinch: carry on panning with the other
+          const [remaining] = Array.from(pointers.values());
+          startPan(remaining.x, remaining.y);
+        } else if (pointers.size === 0) {
+          gesture = null;
+          viewerImg.classList.remove("is-gesturing");
+          if (scale <= 1) resetZoom();
+        }
+      };
+
+      const onWheel = event => {
+        if (!isOpen) return;
+        event.preventDefault();
+        const unit =
+          event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? window.innerHeight : 1;
+        // Multiplicative steps feel the same at every zoom level; trackpad
+        // pinches arrive as ctrl+wheel with much smaller deltas
+        const sensitivity = event.ctrlKey ? 0.01 : 0.0015;
+        zoomAt(scale * Math.exp(-event.deltaY * unit * sensitivity), event.clientX, event.clientY);
+      };
+
       const onKeyDown = event => {
-        if (event.key === "Enter" || event.key === " ") {
+        if (!isOpen) return;
+        const center = viewerCenter();
+        if (event.key === "Escape") {
           event.preventDefault();
-          event.stopPropagation();
-          open(img);
+          close();
+        } else if (event.key === "Tab") {
+          // The close button is the only control, so keep focus inside the dialog
+          event.preventDefault();
+          closeBtn.focus();
+        } else if (event.key === "+" || event.key === "=") {
+          zoomAt(scale * 1.25, center.x, center.y);
+        } else if (event.key === "-") {
+          zoomAt(scale / 1.25, center.x, center.y);
+        } else if (event.key === "0") {
+          resetZoom();
         }
       };
 
-      const hadTabIndex = img.hasAttribute("tabindex");
-      if (!hadTabIndex) {
-        img.tabIndex = 0;
-      }
+      const onResize = () => {
+        if (!isOpen || !activeImage) return;
+        fitToViewport(activeImage);
+        resetZoom();
+      };
 
-      img.classList.add("zoomable-image");
-      img.addEventListener("click", onClick);
-      img.addEventListener("keydown", onKeyDown);
-      listeners.set(img, { onClick, onKeyDown, hadTabIndex });
-    });
+      const onCloseClick = () => close();
 
-    viewer.addEventListener("click", onBackdropClick);
-    viewer.addEventListener("wheel", onWheel, { passive: false });
-    viewerImg.addEventListener("dragstart", onDragStart);
-    viewerImg.addEventListener("pointerdown", onPointerDown);
-    viewerImg.addEventListener("pointermove", onPointerMove);
-    viewerImg.addEventListener("pointerup", endDrag);
-    viewerImg.addEventListener("pointercancel", endDrag);
-    viewerImg.addEventListener("pointerleave", endDrag);
-    document.addEventListener("keydown", onEsc);
-
-    return () => {
-      close();
       articleImages.forEach(img => {
-        const { onClick, onKeyDown, hadTabIndex } = listeners.get(img) ?? {};
-        if (onClick) img.removeEventListener("click", onClick);
-        if (onKeyDown) img.removeEventListener("keydown", onKeyDown);
-        if (!hadTabIndex && img.tabIndex === 0) {
-          img.removeAttribute("tabindex");
+        const onClick = event => {
+          event?.preventDefault();
+          event?.stopPropagation();
+          open(img);
+        };
+        const onKeyDown = event => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            event.stopPropagation();
+            open(img);
+          }
+        };
+
+        const hadTabIndex = img.hasAttribute("tabindex");
+        if (!hadTabIndex) {
+          img.tabIndex = 0;
         }
-        img.classList.remove("zoomable-image");
+
+        img.classList.add("zoomable-image");
+        img.addEventListener("click", onClick);
+        img.addEventListener("keydown", onKeyDown);
+        listeners.set(img, { onClick, onKeyDown, hadTabIndex });
       });
 
-      viewer.removeEventListener("click", onBackdropClick);
-      viewer.removeEventListener("wheel", onWheel);
-      viewerImg.removeEventListener("dragstart", onDragStart);
-      viewerImg.removeEventListener("pointerdown", onPointerDown);
-      viewerImg.removeEventListener("pointermove", onPointerMove);
-      viewerImg.removeEventListener("pointerup", endDrag);
-      viewerImg.removeEventListener("pointercancel", endDrag);
-      viewerImg.removeEventListener("pointerleave", endDrag);
-      document.removeEventListener("keydown", onEsc);
-      document.body.classList.remove("image-viewer-open");
-    };
-  }
-  cleanupImageViewer = initImageViewer();
+      closeBtn.addEventListener("click", onCloseClick);
+      viewer.addEventListener("pointerdown", onPointerDown);
+      viewer.addEventListener("pointermove", onPointerMove);
+      viewer.addEventListener("pointerup", onPointerUp);
+      viewer.addEventListener("pointercancel", onPointerUp);
+      viewer.addEventListener("wheel", onWheel, { passive: false });
+      document.addEventListener("keydown", onKeyDown);
+      window.addEventListener("resize", onResize);
 
-  /** Update the progress bar
-   *  when user scrolls */
-  function updateScrollProgress() {
-    document.addEventListener("scroll", () => {
-      const winScroll =
-        document.body.scrollTop || document.documentElement.scrollTop;
-      const height =
-        document.documentElement.scrollHeight -
-        document.documentElement.clientHeight;
-      const scrolled = (winScroll / height) * 100;
-      if (document) {
-        const myBar = document.getElementById("myBar");
-        if (myBar) {
-          myBar.style.width = scrolled + "%";
-        }
-      }
-    });
-  }
-  updateScrollProgress();
+      return () => {
+        close({ immediate: true });
+        articleImages.forEach(img => {
+          const { onClick, onKeyDown, hadTabIndex } = listeners.get(img) ?? {};
+          if (onClick) img.removeEventListener("click", onClick);
+          if (onKeyDown) img.removeEventListener("keydown", onKeyDown);
+          if (!hadTabIndex && img.tabIndex === 0) {
+            img.removeAttribute("tabindex");
+          }
+          img.classList.remove("zoomable-image");
+        });
 
-  /** Attaches links to headings in the document,
-   *  allowing sharing of sections easily */
-  function addHeadingLinks() {
-    const headings = Array.from(
-      document.querySelectorAll("h2, h3, h4, h5, h6")
-    );
-    for (const heading of headings) {
-      heading.classList.add("group");
-      const link = document.createElement("a");
-      link.className =
-        "heading-link ml-2 opacity-0 group-hover:opacity-100 focus:opacity-100";
-      link.href = "#" + heading.id;
-
-      const span = document.createElement("span");
-      span.ariaHidden = "true";
-      span.innerText = "#";
-      link.appendChild(span);
-      heading.appendChild(link);
-    }
-  }
-  addHeadingLinks();
-
-  /** Attaches copy buttons to code blocks in the document,
-   * allowing users to copy code easily. */
-  function attachCopyButtons() {
-    const copyIcon = "⧉";
-    const copiedIcon = "✓";
-    const codeBlocks = Array.from(document.querySelectorAll("pre"));
-
-    const getLanguage = block => {
-      const dataLang = block.getAttribute("data-language");
-      if (dataLang) return dataLang;
-      const codeEl = block.querySelector("code");
-      const classNames = [
-        ...block.classList,
-        ...(codeEl?.classList ?? []),
-      ];
-      for (const cls of classNames) {
-        const match = cls.match(/(?:lang|language)-(.+)/i);
-        if (match?.[1]) return match[1];
-      }
-      return "text";
-    };
-
-    const formatLanguageLabel = lang => {
-      const key = (lang ?? "text").toLowerCase();
-      const nameMap = {
-        js: "javascript",
-        ts: "typescript",
-        py: "python",
-        rb: "ruby",
-        rs: "rust",
-        sh: "shell",
-        zsh: "shell",
-        bash: "shell",
-        yml: "yaml",
-        md: "markdown",
-        cplusplus: "cpp",
-        cs: "csharp",
+        closeBtn.removeEventListener("click", onCloseClick);
+        viewer.removeEventListener("pointerdown", onPointerDown);
+        viewer.removeEventListener("pointermove", onPointerMove);
+        viewer.removeEventListener("pointerup", onPointerUp);
+        viewer.removeEventListener("pointercancel", onPointerUp);
+        viewer.removeEventListener("wheel", onWheel);
+        document.removeEventListener("keydown", onKeyDown);
+        window.removeEventListener("resize", onResize);
+        document.documentElement.classList.remove("image-viewer-open");
       };
-      const normalized = nameMap[key] ?? key;
-      const cleaned = normalized.replace(/[\s_-]+/g, " ").trim();
-      return (cleaned || "text").toUpperCase();
-    };
+    }
 
-    for (const codeBlock of codeBlocks) {
-      // avoid double-wrapping if already enhanced
-      if (codeBlock.parentElement?.classList.contains("code-block-wrapper")) {
-        continue;
+    /** Attaches links to headings in the article,
+     *  allowing sharing of sections easily */
+    function addHeadingLinks() {
+      const headings = Array.from(
+        document.querySelectorAll(
+          "#article h2, #article h3, #article h4, #article h5, #article h6"
+        )
+      );
+      for (const heading of headings) {
+        heading.classList.add("group");
+        const link = document.createElement("a");
+        link.className =
+          "heading-link ml-2 opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100";
+        link.href = "#" + heading.id;
+
+        const span = document.createElement("span");
+        span.ariaHidden = "true";
+        span.innerText = "#";
+        link.appendChild(span);
+        heading.appendChild(link);
+      }
+    }
+
+    /** Attaches copy buttons to code blocks in the article,
+     * allowing users to copy code easily. */
+    function attachCopyButtons() {
+      const copyIcon = "⧉";
+      const copiedIcon = "✓";
+      const codeBlocks = Array.from(document.querySelectorAll("#article pre"));
+
+      const getLanguage = block => {
+        const dataLang = block.getAttribute("data-language");
+        if (dataLang) return dataLang;
+        const codeEl = block.querySelector("code");
+        const classNames = [
+          ...block.classList,
+          ...(codeEl?.classList ?? []),
+        ];
+        for (const cls of classNames) {
+          const match = cls.match(/(?:lang|language)-(.+)/i);
+          if (match?.[1]) return match[1];
+        }
+        return "text";
+      };
+
+      const formatLanguageLabel = lang => {
+        const key = (lang ?? "text").toLowerCase();
+        const nameMap = {
+          js: "javascript",
+          ts: "typescript",
+          py: "python",
+          rb: "ruby",
+          rs: "rust",
+          sh: "shell",
+          zsh: "shell",
+          bash: "shell",
+          yml: "yaml",
+          md: "markdown",
+          cplusplus: "cpp",
+          cs: "csharp",
+        };
+        const normalized = nameMap[key] ?? key;
+        const cleaned = normalized.replace(/[\s_-]+/g, " ").trim();
+        return (cleaned || "text").toUpperCase();
+      };
+
+      for (const codeBlock of codeBlocks) {
+        // avoid double-wrapping if already enhanced
+        if (codeBlock.parentElement?.classList.contains("code-block-wrapper")) {
+          continue;
+        }
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "code-block-wrapper";
+
+        const copyButton = document.createElement("button");
+        copyButton.type = "button";
+        copyButton.className = "copy-code";
+        copyButton.setAttribute("aria-label", "Copy code");
+        copyButton.innerHTML = copyIcon;
+        codeBlock.setAttribute("tabindex", "0");
+
+        const languageLabel = document.createElement("div");
+        languageLabel.className = "code-language";
+        languageLabel.textContent = formatLanguageLabel(getLanguage(codeBlock));
+
+        // wrap code block with relative parent element and place overlays on top
+        codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
+        wrapper.appendChild(codeBlock);
+        wrapper.appendChild(copyButton);
+        wrapper.appendChild(languageLabel);
+
+        copyButton.addEventListener("click", async () => {
+          await copyCode(codeBlock, copyButton);
+        });
+
+        // when pointer leaves, drop button focus so the language label returns
+        wrapper.addEventListener("pointerleave", () => {
+          if (document.activeElement === copyButton) {
+            copyButton.blur();
+          }
+        });
       }
 
-      const wrapper = document.createElement("div");
-      wrapper.className = "code-block-wrapper";
+      async function copyCode(block, button) {
+        const code = block.querySelector("code");
+        const text = code?.innerText;
 
-      const copyButton = document.createElement("button");
-      copyButton.type = "button";
-      copyButton.className = "copy-code";
-      copyButton.setAttribute("aria-label", "Copy code");
-      copyButton.innerHTML = copyIcon;
-      codeBlock.setAttribute("tabindex", "0");
+        await navigator.clipboard.writeText(text ?? "");
 
-      const languageLabel = document.createElement("div");
-      languageLabel.className = "code-language";
-      languageLabel.textContent = formatLanguageLabel(getLanguage(codeBlock));
+        // visual feedback that task is completed
+        button.innerText = copiedIcon;
 
-      // wrap code block with relative parent element and place overlays on top
-      codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
-      wrapper.appendChild(codeBlock);
-      wrapper.appendChild(copyButton);
-      wrapper.appendChild(languageLabel);
-
-      copyButton.addEventListener("click", async () => {
-        await copyCode(codeBlock, copyButton);
-      });
-
-      // when pointer leaves, drop button focus so the language label returns
-      wrapper.addEventListener("pointerleave", () => {
-        if (document.activeElement === copyButton) {
-          copyButton.blur();
-        }
-      });
+        setTimeout(() => {
+          button.innerText = copyIcon;
+        }, 1400);
+      }
     }
 
-    async function copyCode(block, button) {
-      const code = block.querySelector("code");
-      const text = code?.innerText;
-
-      await navigator.clipboard.writeText(text ?? "");
-
-      // visual feedback that task is completed
-      button.innerText = copiedIcon;
-
-      setTimeout(() => {
-        button.innerText = copyIcon;
-      }, 1400);
-    }
-  }
-  attachCopyButtons();
-
-  /** Scrolls the document to the top when
-   * the "Back to Top" button is clicked. */
-  function backToTop() {
-    document.querySelector("#back-to-top")?.addEventListener("click", () => {
-      document.body.scrollTop = 0; // For Safari
-      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-    });
-  }
-  backToTop();
-
-  /* Go to page start after page swap */
-  document.addEventListener("astro:after-swap", () => {
-    cleanupTocHighlight?.();
-    cleanupRevealOnScroll?.();
-    cleanupImageViewer?.();
-    cleanupTocHighlight = initTocHighlight();
-    cleanupRevealOnScroll = initRevealOnScroll();
-    cleanupImageViewer = initImageViewer();
+    const cleanups = [
+      initProgressBar(),
+      initTocHighlight(),
+      initImageViewer(),
+    ];
+    addHeadingLinks();
     attachCopyButtons();
-    schedulePositionToc();
-    window.scrollTo({ left: 0, top: 0, behavior: "instant" });
-  });
+
+    // Tear down before the next page replaces this one; a following post re-runs this script
+    document.addEventListener(
+      "astro:before-swap",
+      () => cleanups.forEach(cleanup => cleanup?.()),
+      { once: true }
+    );
+  })();
 </script>

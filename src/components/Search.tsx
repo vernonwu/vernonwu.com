@@ -8,10 +8,14 @@ export type SearchItem = {
   description: string;
   data: CollectionEntry<"blog">["data"];
   slug: string;
+  readingTime?: number;
 };
 
 interface Props {
   searchList: SearchItem[];
+  /** "page" mirrors the query in the URL (?q=); "dialog" is the ⌘K pop-up,
+   *  which must leave the URL of whatever page it opens on alone */
+  variant?: "page" | "dialog";
 }
 
 interface SearchResult {
@@ -19,7 +23,8 @@ interface SearchResult {
   refIndex: number;
 }
 
-export default function SearchBar({ searchList }: Props) {
+export default function SearchBar({ searchList, variant = "page" }: Props) {
+  const syncUrl = variant === "page";
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputVal, setInputVal] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[] | null>(
@@ -42,6 +47,13 @@ export default function SearchBar({ searchList }: Props) {
   );
 
   useEffect(() => {
+    if (!syncUrl) {
+      // Keep anything typed before this island hydrated
+      const typed = inputRef.current?.value;
+      if (typed) setInputVal(typed);
+      return;
+    }
+
     // if URL has search query,
     // insert that search query in input field
     const searchUrl = new URLSearchParams(window.location.search);
@@ -60,6 +72,8 @@ export default function SearchBar({ searchList }: Props) {
     // input value is more than one character
     const inputResult = inputVal.length > 1 ? fuse.search(inputVal) : [];
     setSearchResults(inputResult);
+
+    if (!syncUrl) return;
 
     // Update search string in URL
     if (inputVal.length > 0) {
@@ -96,7 +110,7 @@ export default function SearchBar({ searchList }: Props) {
       </label>
 
       {inputVal.length > 1 && (
-        <div className="mt-8">
+        <div className={syncUrl ? "mt-8" : "mt-4 text-sm opacity-80"}>
           Found {searchResults?.length}
           {searchResults?.length && searchResults?.length === 1
             ? " result"
@@ -111,6 +125,7 @@ export default function SearchBar({ searchList }: Props) {
             <Card
               href={`/posts/${item.slug}/`}
               frontmatter={item.data}
+              readingTime={item.readingTime}
               key={`${refIndex}-${item.slug}`}
             />
           ))}

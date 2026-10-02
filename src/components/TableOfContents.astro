@@ -3,11 +3,18 @@ import type { MarkdownHeading } from "astro";
 
 interface Props {
   headings: MarkdownHeading[];
+  /** "sidebar" is the sticky desktop panel; "inline" is a collapsible block for narrow screens */
+  variant?: "sidebar" | "inline";
+  class?: string;
 }
 
 type TocNode = MarkdownHeading & { children: TocNode[] };
 
-const { headings = [] } = Astro.props as Props;
+const {
+  headings = [],
+  variant = "sidebar",
+  class: className,
+} = Astro.props as Props;
 
 const tocTree: TocNode[] = [];
 const parents: TocNode[] = [];
@@ -37,58 +44,77 @@ for (const heading of headings.filter(({ depth }) => depth >= 2 && depth <= 4)) 
 }
 
 const hasHeadings = tocTree.length > 0;
+const Wrapper = variant === "inline" ? "details" : "div";
 ---
 
 {hasHeadings && (
-  <nav aria-label="Table of contents" class="toc-card">
-    <div class="toc-heading">On this page</div>
-    <ul class="space-y-1">
-      {tocTree.map((section, sectionIndex) => (
-        <li class="group" data-toc-item={section.slug}>
-          <a class="toc-link" href={`#${section.slug}`} data-toc-slug={section.slug}>
-            <span class="toc-badge">{sectionIndex + 1}</span>
-            <span class="toc-text">{section.text}</span>
-          </a>
+  <Wrapper
+    class:list={["toc-card", `toc--${variant}`, className]}
+    data-toc-root={variant}
+  >
+    {variant === "inline" ? (
+      <summary class="toc-heading toc-summary">
+        <span>On this page</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="toc-chevron" aria-hidden="true">
+          <path d="M16.293 9.293 12 13.586 7.707 9.293l-1.414 1.414L12 16.414l5.707-5.707z" />
+        </svg>
+      </summary>
+    ) : (
+      <div class="toc-heading">On this page</div>
+    )}
+    <nav aria-label="Table of contents">
+      <ul class="space-y-1">
+        {tocTree.map((section, sectionIndex) => (
+          <li data-toc-item={section.slug}>
+            <a class="toc-link" href={`#${section.slug}`} data-toc-slug={section.slug}>
+              <span class="toc-badge">{sectionIndex + 1}</span>
+              <span class="toc-text">{section.text}</span>
+            </a>
 
-          {section.children.length > 0 && (
-            <ul class="toc-children">
-              {section.children.map((subsection, subsectionIndex) => (
-                <li class="group" data-toc-item={subsection.slug}>
-                  <a
-                    class="toc-link toc-sub"
-                    href={`#${subsection.slug}`}
-                    data-toc-slug={subsection.slug}
-                  >
-                    <span class="toc-text toc-text-sub">
-                      {`${sectionIndex + 1}.${subsectionIndex + 1} ${subsection.text}`}
-                    </span>
-                  </a>
+            {section.children.length > 0 && (
+              <div class="toc-collapse">
+                <ul class="toc-children">
+                  {section.children.map((subsection, subsectionIndex) => (
+                    <li data-toc-item={subsection.slug}>
+                      <a
+                        class="toc-link toc-sub"
+                        href={`#${subsection.slug}`}
+                        data-toc-slug={subsection.slug}
+                      >
+                        <span class="toc-text toc-text-sub">
+                          {`${sectionIndex + 1}.${subsectionIndex + 1} ${subsection.text}`}
+                        </span>
+                      </a>
 
-                  {subsection.children.length > 0 && (
-                    <ul class="toc-children">
-                      {subsection.children.map((topic, topicIndex) => (
-                        <li data-toc-item={topic.slug}>
-                          <a
-                            class="toc-link toc-leaf"
-                            href={`#${topic.slug}`}
-                            data-toc-slug={topic.slug}
-                          >
-                            <span class="toc-text toc-text-leaf">
-                              {`${sectionIndex + 1}.${subsectionIndex + 1}.${topicIndex + 1} ${topic.text}`}
-                            </span>
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </li>
-      ))}
-    </ul>
-  </nav>
+                      {subsection.children.length > 0 && (
+                        <div class="toc-collapse">
+                          <ul class="toc-children">
+                            {subsection.children.map((topic, topicIndex) => (
+                              <li data-toc-item={topic.slug}>
+                                <a
+                                  class="toc-link toc-leaf"
+                                  href={`#${topic.slug}`}
+                                  data-toc-slug={topic.slug}
+                                >
+                                  <span class="toc-text toc-text-leaf">
+                                    {`${sectionIndex + 1}.${subsectionIndex + 1}.${topicIndex + 1} ${topic.text}`}
+                                  </span>
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </Wrapper>
 )}
 
 <style>
@@ -120,14 +146,6 @@ const hasHeadings = tocTree.length > 0;
     @apply inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-skin-accent px-2 text-xs font-semibold text-skin-inverted;
   }
 
-  .toc-badge-sub {
-    @apply border border-skin-line bg-skin-inverted text-skin-base;
-  }
-
-  .toc-badge-leaf {
-    @apply border border-skin-line bg-skin-card text-skin-base;
-  }
-
   .toc-text {
     @apply leading-5;
   }
@@ -142,22 +160,78 @@ const hasHeadings = tocTree.length > 0;
 
   .toc-children {
     @apply ml-4 border-l border-dashed border-skin-line pl-3;
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    will-change: max-height, opacity;
-    transition: max-height 320ms cubic-bezier(0.25, 0.8, 0.25, 1),
-      opacity 220ms ease-in-out;
   }
 
   .toc-children .toc-children {
     @apply ml-3;
   }
 
-  .group:hover > .toc-children,
-  .group:focus-within > .toc-children,
-  .open > .toc-children {
-    max-height: 120vh;
+  /* Collapse via grid rows (0fr -> 1fr) so open and close both animate evenly */
+  .toc-collapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 200ms ease;
+  }
+
+  .toc-collapse > .toc-children {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* Expand the section being read (set by the scroll-spy) or the one holding keyboard focus */
+  .open > .toc-collapse,
+  li:focus-within > .toc-collapse,
+  .toc--inline .toc-collapse {
+    grid-template-rows: 1fr;
     opacity: 1;
+  }
+
+  /* ===== Inline (narrow screen) variant ===== */
+  .toc--inline {
+    @apply p-0;
+  }
+
+  .toc-summary {
+    @apply mb-0 flex cursor-pointer select-none items-center justify-between px-4 py-3;
+    list-style: none;
+  }
+
+  .toc-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .toc-chevron {
+    @apply h-5 w-5 opacity-70;
+    transition: transform 200ms ease;
+  }
+
+  .toc--inline[open] .toc-chevron {
+    transform: rotate(180deg);
+  }
+
+  .toc--inline nav {
+    @apply px-2 pb-3;
+  }
+
+  /* Animate the disclosure where the browser supports animating to height: auto */
+  @supports (interpolate-size: allow-keywords) {
+    .toc--inline {
+      interpolate-size: allow-keywords;
+    }
+
+    .toc--inline::details-content {
+      block-size: 0;
+      overflow: clip;
+      transition:
+        block-size 280ms cubic-bezier(0.22, 1, 0.36, 1),
+        content-visibility 280ms allow-discrete;
+    }
+
+    .toc--inline[open]::details-content {
+      block-size: auto;
+    }
   }
 </style>

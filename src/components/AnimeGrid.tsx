@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { flushSync } from "react-dom";
 import type { CollectionItem } from "@utils/myanimelist";
 import "./AnimeGrid.css";
 
@@ -17,6 +18,20 @@ function buildTotals(items: CollectionItem[]) {
     },
     { type: {} as Record<string, number>, status: {} as Record<string, number> }
   );
+}
+
+/** Apply a state update inside a view transition, so cards that stay on
+ *  screen glide to their new positions and the rest fade in or out */
+function withViewTransition(update: () => void) {
+  if (
+    !document.startViewTransition ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    update();
+    return;
+  }
+  // Rejects when the browser skips the animation; the update still applies
+  document.startViewTransition(() => flushSync(update)).ready.catch(() => {});
 }
 
 export default function AnimeGrid({ items }: { items: CollectionItem[] }) {
@@ -72,10 +87,6 @@ export default function AnimeGrid({ items }: { items: CollectionItem[] }) {
   );
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [activeType, activeStatus]);
-
-  useEffect(() => {
     setCurrentPage(prev => Math.min(prev, totalPages));
   }, [totalPages]);
 
@@ -90,19 +101,27 @@ export default function AnimeGrid({ items }: { items: CollectionItem[] }) {
 
   const handleTypeChange = (key: TypeFilterKey, disabled: boolean) => {
     if (disabled || key === activeType) return;
-    setActiveType(key);
+    withViewTransition(() => {
+      setActiveType(key);
+      setCurrentPage(1);
+    });
   };
 
   const handleStatusChange = (key: StatusFilterKey, disabled: boolean) => {
     if (disabled || key === activeStatus) return;
-    setActiveStatus(key);
+    withViewTransition(() => {
+      setActiveStatus(key);
+      setCurrentPage(1);
+    });
   };
 
   const handlePageChange = (direction: "prev" | "next") => {
-    setCurrentPage(prev => {
-      if (direction === "prev") return Math.max(1, prev - 1);
-      return Math.min(totalPages, prev + 1);
-    });
+    const next =
+      direction === "prev"
+        ? Math.max(1, currentPage - 1)
+        : Math.min(totalPages, currentPage + 1);
+    if (next === currentPage) return;
+    withViewTransition(() => setCurrentPage(next));
   };
 
   return (
@@ -189,6 +208,7 @@ export default function AnimeGrid({ items }: { items: CollectionItem[] }) {
                 <li
                   key={`${item.id}-${item.kind}`}
                   className="collection-card"
+                  style={{ viewTransitionName: `mal-${item.kind}-${item.id}` }}
                   data-item
                   data-type={item.typeCategory}
                   data-status={item.statusCategory}

@@ -8,6 +8,7 @@ import Hr from "@components/Hr.astro";
 import Card from "@components/Card";
 import Socials from "@components/Socials.astro";
 import getSortedPosts from "@utils/getSortedPosts";
+import getReadingTime from "@utils/getReadingTime";
 import { SITE, SOCIALS } from "@config";
 
 const posts = await getCollection("blog");
@@ -23,32 +24,44 @@ const socialCount = SOCIALS.filter(social => social.active).length;
   <Header />
   <main id="main-content">
     <section id="hero">
-      <h1>TL;DR</h1>
-      <a
-        target="_blank"
-        href="/rss.xml"
-        class="rss-link"
-        aria-label="rss feed"
-        title="RSS Feed"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="rss-icon"
-          ><path
-            d="M19 20.001C19 11.729 12.271 5 4 5v2c7.168 0 13 5.832 13 13.001h2z"
-          ></path><path
-            d="M12 20.001h2C14 14.486 9.514 10 4 10v2c4.411 0 8 3.589 8 8.001z"
-          ></path><circle cx="6" cy="18" r="2"></circle>
-        </svg>
-        <span class="sr-only">RSS Feed</span>
-      </a>
+      <div class="hero-head">
+        <img
+          src="/avatar.jpg"
+          alt=""
+          width="96"
+          height="96"
+          class="avatar"
+          decoding="async"
+        />
+        <div>
+          <h1>{SITE.author}</h1>
+          <a
+            target="_blank"
+            href="/rss.xml"
+            class="rss-link"
+            aria-label="rss feed"
+            title="RSS Feed"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="rss-icon"
+              ><path
+                d="M19 20.001C19 11.729 12.271 5 4 5v2c7.168 0 13 5.832 13 13.001h2z"
+              ></path><path
+                d="M12 20.001h2C14 14.486 9.514 10 4 10v2c4.411 0 8 3.589 8 8.001z"
+              ></path><circle cx="6" cy="18" r="2"></circle>
+            </svg>
+            <span class="sr-only">RSS Feed</span>
+          </a>
+          <p class="tagline">
+            Programmer, researcher, idealist, fiction & anime enjoyer, human.
+          </p>
+        </div>
+      </div>
 
-      <p>
-        Programmer, researcher, idealist, fiction & anime enjoyer, human.
-      </p>
       <p>
         Read the blog posts or check
         <LinkButton
           className="underline decoration-dashed underline-offset-4 hover:text-skin-accent"
-          href="https://vernonwu.com"
+          href="/about/"
         >
           my bio
         </LinkButton> for more info.
@@ -57,12 +70,11 @@ const socialCount = SOCIALS.filter(social => social.active).length;
         // only display if at least one social link is enabled
         socialCount > 0 && (
           <div class="social-wrapper">
-            <div class="social-links">Social Links:</div>
             <Socials />
           </div>
         )
       }
-  </section>
+    </section>
 
   {
       featuredPosts.length > 0 && (
@@ -70,11 +82,12 @@ const socialCount = SOCIALS.filter(social => social.active).length;
           <section id="featured">
             <h2>Featured</h2>
             <ul>
-              {featuredPosts.map(({ data, slug }) => (
+              {featuredPosts.map(({ data, slug, body }) => (
                 <Card
                   href={`/posts/${slug}/`}
                   frontmatter={data}
                   secHeading={false}
+                  readingTime={getReadingTime(body)}
                 />
               ))}
             </ul>
@@ -90,12 +103,13 @@ const socialCount = SOCIALS.filter(social => social.active).length;
           <h2>Recent Posts</h2>
           <ul>
             {recentPosts.map(
-              ({ data, slug }, index) =>
+              ({ data, slug, body }, index) =>
                 index < SITE.postPerIndex && (
                   <Card
                     href={`/posts/${slug}/`}
                     frontmatter={data}
                     secHeading={false}
+                    readingTime={getReadingTime(body)}
                   />
                 )
             )}
@@ -124,23 +138,29 @@ const socialCount = SOCIALS.filter(social => social.active).length;
   #hero {
     @apply pb-6 pt-8;
   }
+  .hero-head {
+    @apply my-4 flex items-center gap-4 sm:my-8 sm:gap-6;
+  }
+  .avatar {
+    @apply h-16 w-16 shrink-0 rounded-full border-2 border-skin-line object-cover sm:h-24 sm:w-24;
+  }
   #hero h1 {
-    @apply my-4 inline-block text-3xl font-bold sm:my-8 sm:text-5xl;
+    @apply inline-block text-3xl font-bold sm:text-5xl;
   }
   #hero .rss-link {
-    @apply mb-6;
+    @apply ml-2 align-top;
   }
   #hero .rss-icon {
-    @apply mb-2 h-6 w-6 scale-110 fill-skin-accent sm:mb-3 sm:scale-125;
+    @apply h-6 w-6 scale-110 fill-skin-accent sm:scale-125;
   }
   #hero p {
     @apply my-2;
   }
-  .social-wrapper {
-    @apply mt-4 flex flex-col sm:flex-row sm:items-center;
+  #hero .tagline {
+    @apply mb-0 mt-1 italic opacity-80;
   }
-  .social-links {
-    @apply mb-1 mr-2 whitespace-nowrap sm:mb-0;
+  .social-wrapper {
+    @apply -ml-2 mt-4 flex sm:-ml-1;
   }
 
   /* ===== Featured & Recent Posts Sections ===== */

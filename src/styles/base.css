@@ -2,13 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Self-hosted and bundled (hashed, long-cached), subset to Latin, Greek,
+   punctuation and math symbols */
 @font-face {
   font-family: "New Computer Modern";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("https://cdn.jsdelivr.net/gh/vernonwu/picx-images-hosting@master/20260101/NewCM10-Book.otf")
-    format("opentype");
+  src: url("../assets/fonts/NewCM10-Book.woff2") format("woff2");
 }
 
 @font-face {
@@ -16,8 +17,7 @@
   font-style: italic;
   font-weight: 400;
   font-display: swap;
-  src: url("https://cdn.jsdelivr.net/gh/vernonwu/picx-images-hosting@master/20260101/NewCM10-BookItalic.otf")
-    format("opentype");
+  src: url("../assets/fonts/NewCM10-BookItalic.woff2") format("woff2");
 }
 
 @font-face {
@@ -25,8 +25,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("https://cdn.jsdelivr.net/gh/vernonwu/picx-images-hosting@master/20260101/NewCM10-Bold.otf")
-    format("opentype");
+  src: url("../assets/fonts/NewCM10-Bold.woff2") format("woff2");
 }
 
 @font-face {
@@ -34,8 +33,7 @@
   font-style: italic;
   font-weight: 700;
   font-display: swap;
-  src: url("https://cdn.jsdelivr.net/gh/vernonwu/picx-images-hosting@master/20260101/NewCM10-BoldItalic.otf")
-    format("opentype");
+  src: url("../assets/fonts/NewCM10-BoldItalic.woff2") format("woff2");
 }
 
 @font-face {
@@ -45,9 +43,9 @@
   font-display: swap;
   src: url("https://cdn.jsdelivr.net/gh/vernonwu/picx-images-hosting@master/20260101/SourceHanSerifSC-VF.otf.woff2")
     format("woff2");
+  /* CJK only: General Punctuation (dashes, curly quotes) would pull in this 20 MB file */
   unicode-range:
-    U+2000-206F, U+2E00-2E7F, U+3000-303F, U+3400-4DB5, U+4E00-9FFF,
-    U+F900-FAFF, U+FF00-FFEF;
+    U+2E00-2E7F, U+3000-303F, U+3400-4DB5, U+4E00-9FFF, U+F900-FAFF, U+FF00-FFEF;
 }
 
 @layer base {
@@ -60,13 +58,14 @@
     --color-card-muted: 205, 205, 205;
     --color-border: 236, 233, 233;
   }
+  /* One accent hue (the sky blue of the avatar) in both themes; borders stay neutral */
   html[data-theme="dark"] {
     --color-fill: 33, 39, 55;
     --color-text-base: 234, 237, 243;
-    --color-accent: 255, 107, 1;
+    --color-accent: 110, 180, 240;
     --color-card: 52, 63, 96;
-    --color-card-muted: 138, 51, 2;
-    --color-border: 171, 75, 8;
+    --color-card-muted: 70, 82, 112;
+    --color-border: 59, 68, 92;
   }
   #sun-svg,
   html[data-theme="dark"] #moon-svg {
@@ -93,10 +92,14 @@
     @apply inline-block h-6 w-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110;
   }
   .prose {
-    @apply prose-headings:!mb-3 prose-headings:!text-skin-base prose-h3:italic prose-p:!text-skin-base prose-a:!text-skin-base prose-a:!decoration-dashed prose-a:underline-offset-8 hover:prose-a:text-skin-accent prose-blockquote:!border-l-skin-accent/50 prose-blockquote:opacity-80 prose-figcaption:!text-skin-base prose-figcaption:opacity-70 prose-strong:!text-skin-base prose-code:rounded prose-code:bg-skin-card/75 prose-code:p-1 prose-code:before:!content-none prose-code:after:!content-none prose-ol:!text-skin-base prose-ul:overflow-x-clip prose-ul:!text-skin-base prose-li:marker:!text-skin-accent prose-table:text-skin-base prose-th:border prose-th:border-skin-line prose-td:border prose-td:border-skin-line prose-img:!my-2 prose-img:mx-auto prose-img:border-2 prose-img:border-skin-line prose-hr:!border-skin-line;
+    @apply prose-headings:!mb-3 prose-headings:!text-skin-base prose-h3:italic prose-p:!text-skin-base prose-a:!text-skin-base prose-a:!decoration-dashed prose-a:underline-offset-4 hover:prose-a:text-skin-accent prose-blockquote:!border-l-skin-accent/50 prose-blockquote:opacity-80 prose-figcaption:!text-skin-base prose-figcaption:opacity-70 prose-strong:!text-skin-base prose-code:rounded prose-code:bg-skin-card/75 prose-code:p-1 prose-code:before:!content-none prose-code:after:!content-none prose-ol:!text-skin-base prose-ul:overflow-x-clip prose-ul:!text-skin-base prose-li:marker:!text-skin-accent prose-table:text-skin-base prose-th:border prose-th:border-skin-line prose-td:border prose-td:border-skin-line prose-img:!my-2 prose-img:mx-auto prose-img:border-2 prose-img:border-skin-line prose-hr:!border-skin-line;
   }
   .prose a {
     @apply break-words hover:!text-skin-accent;
+  }
+  /* Land anchor jumps below the sticky header rather than under it */
+  .prose :is(h2, h3, h4, h5, h6) {
+    scroll-margin-top: calc(var(--header-height, 0px) + 1rem);
   }
   .prose thead th:first-child,
   tbody td:first-child,
@@ -119,6 +122,8 @@
   /* ===== scrollbar ===== */
   html {
     overflow-y: scroll;
+    /* keep the gutter when scrolling is locked (image viewer), so the page doesn't shift */
+    scrollbar-gutter: stable;
   }
 
   /* width */
@@ -174,9 +179,6 @@
 }
 
 @layer components {
-  .display-none {
-    @apply hidden;
-  }
   .focus-outline {
     @apply outline-2 outline-offset-1 outline-skin-fill focus-visible:no-underline focus-visible:outline-dashed;
   }
@@ -195,4 +197,58 @@
 
 .katex-display:hover::-webkit-scrollbar {
   display: block;
+}
+
+/* Respect the OS "reduce motion" setting across all hover and reveal transitions */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===== Page transitions (see `pageTransition` in Layout.astro) ===== */
+@keyframes vtPageOut {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vtPageIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* The wavy underline under the active nav link slides to the next one */
+::view-transition-group(nav-indicator) {
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Stretch rather than keep aspect ratio, or the 6px line grows taller as it widens */
+::view-transition-old(nav-indicator),
+::view-transition-new(nav-indicator) {
+  height: 100%;
+}
+
+/* ===== Theme toggle reveal (see public/toggle-theme.js) =====
+   transition:animate on <html> renames the root snapshot, so name it back */
+html.theme-transition {
+  view-transition-name: root !important;
+}
+
+html.theme-transition * {
+  view-transition-name: none !important;
+}
+
+html.theme-transition::view-transition-old(root),
+html.theme-transition::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }

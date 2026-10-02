@@ -16,6 +16,10 @@ export default defineConfig({
   site: SITE.website,
   output: "server",
   adapter: vercel(),
+  // Archives were folded into /posts, which now groups posts by year
+  redirects: {
+    "/archives": "/posts/",
+  },
   integrations: [
     tailwind({
       applyBaseStyles: false,

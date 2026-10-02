@@ -55,9 +55,57 @@ window.onload = () => {
     reflectPreference();
 
     // now this script can find and listen for clicks on the control
-    document.querySelector("#theme-btn")?.addEventListener("click", () => {
-      themeValue = themeValue === "light" ? "dark" : "light";
-      setPreference();
+    document.querySelector("#theme-btn")?.addEventListener("click", event => {
+      const toggle = () => {
+        themeValue = themeValue === "light" ? "dark" : "light";
+        setPreference();
+      };
+
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      if (!document.startViewTransition || reduceMotion) {
+        toggle();
+        return;
+      }
+
+      // Reveal the new theme as a circle growing out of the toggle button
+      const { left, top, width, height } =
+        event.currentTarget.getBoundingClientRect();
+      const x = left + width / 2;
+      const y = top + height / 2;
+      const radius = Math.hypot(
+        Math.max(x, window.innerWidth - x),
+        Math.max(y, window.innerHeight - y)
+      );
+
+      // Only the root snapshot should animate, so named elements
+      // (header, post titles) are flattened into it for this transition
+      const root = document.documentElement;
+      root.classList.add("theme-transition");
+      const transition = document.startViewTransition(toggle);
+      // `ready` rejects if the browser skips the transition (e.g. hidden tab);
+      // the theme still changes, just without the reveal
+      transition.ready
+        .then(() => {
+          root.animate(
+            {
+              clipPath: [
+                `circle(0px at ${x}px ${y}px)`,
+                `circle(${radius}px at ${x}px ${y}px)`,
+              ],
+            },
+            {
+              duration: 480,
+              easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+              pseudoElement: "::view-transition-new(root)",
+            }
+          );
+        })
+        .catch(() => {});
+      transition.finished.finally(() =>
+        root.classList.remove("theme-transition")
+      );
     });
   }
 
